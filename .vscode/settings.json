@@ -1,0 +1,20 @@
+{
+  // Set the default
+  "editor.formatOnSave": false,
+  "eslint.validate": [
+    "javascript",
+    "typescript"
+  ],
+  // Enable per-language
+  "[javascript]": {
+    "editor.formatOnSave": true
+  },
+  "[typescript]": {
+    "editor.formatOnSave": true
+  },
+  "editor.codeActionsOnSave": {
+    "source.fixAll.tslint": true,
+    "source.fixAll.eslint": true
+  },
+  "eslint.enable": true
+}
