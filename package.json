@@ -8,7 +8,7 @@
   "license": "BSD-3-Clause",
   "scripts": {
     "test": "jest",
-    "build": "tsc && tsc -t ES5 --outDir lib-es5",
+    "build": "tsc",
     "format": "prettier --write src/**/*.{ts,tsx}",
     "watch": "tsc --watch",
     "prepublishOnly": "npm run build && npm test"
@@ -17,11 +17,18 @@
     "gatsby": "^2.18.17"
   },
   "dependencies": {
+    "axios": "^0.19.0",
     "debug": "^4.1.1",
-    "lodash": "^4.17.15"
+    "fs-extra": "^8.1.0",
+    "lodash": "^4.17.15",
+    "oneline": "^1.0.3"
   },
   "devDependencies": {
+    "@types/axios": "^0.14.0",
+    "@types/fs-extra": "^8.0.1",
+    "@types/graphql": "^14.5.0",
     "@types/jest": "^24.0.24",
+    "@types/lodash": "^4.14.149",
     "@types/node": "^13.1.0",
     "@typescript-eslint/eslint-plugin": "^2.13.0",
     "@typescript-eslint/parser": "^2.13.0",

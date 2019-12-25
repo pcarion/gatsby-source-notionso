@@ -1,4 +1,5 @@
 src
+test
 .eslintrc
 .gitignore
 .editorconfig
