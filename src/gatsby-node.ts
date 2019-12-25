@@ -6,6 +6,8 @@ import {
   // GatsbyResolversCreator,
 } from './types/gatsby';
 
+import retrievePage from './notion/retrievePage';
+
 export interface PluginConfig {
   pageId: string;
   name: string;
@@ -47,6 +49,8 @@ export const sourceNodes = async (
     tokenv2,
     debug,
   };
+
+  await retrievePage(pageId, reporter);
 
   const nodeId = createNodeId(pageId);
   createNode({

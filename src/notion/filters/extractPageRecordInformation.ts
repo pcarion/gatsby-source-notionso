@@ -1,6 +1,6 @@
 import * as util from 'util';
 import * as _ from 'lodash';
-import '../types';
+import '../../types/notion';
 
 export default function extractPageRecordInformation(
   inputs: JsonArray,
