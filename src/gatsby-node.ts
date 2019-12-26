@@ -6,7 +6,8 @@ import {
   // GatsbyResolversCreator,
 } from './types/gatsby';
 
-import retrievePage from './notion/retrievePage';
+// import retrievePage from './notion/retrievePage';
+import loadPage from './notion/loadPage';
 
 export interface PluginConfig {
   pageId: string;
@@ -50,7 +51,7 @@ export const sourceNodes = async (
     debug,
   };
 
-  await retrievePage(pageId, reporter);
+  await loadPage(pageId, reporter);
 
   const nodeId = createNodeId(pageId);
   createNode({
