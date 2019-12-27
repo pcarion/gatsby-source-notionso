@@ -1,3 +1,5 @@
+import './parser.types';
+
 /*
 Example:
 [
@@ -18,20 +20,6 @@ Example:
   [ '.' ]
 ]
 */
-type NotionTextAttributes = string[][];
-type NotionText = [string, NotionTextAttributes?][];
-
-interface NotionTextParsedttributes {
-  isBold: boolean;
-  isItalic: boolean;
-  isStrikeThrough: boolean;
-  isCode: boolean;
-  isLink: boolean;
-  withLink?: string;
-}
-
-type NotionTextParsed = [string, NotionTextParsedttributes][];
-
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export default function parseNotionText(text: NotionText): NotionTextParsed {
   const result: NotionTextParsed = [];
