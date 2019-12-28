@@ -25,8 +25,8 @@ interface BlockPage {
 
 interface BlockCode {
   kind: 'code';
-  code: string;
-  language: string;
+  code: NotionTextParsed;
+  language: NotionTextParsed;
 }
 
 interface BlockUnknown {
@@ -44,9 +44,19 @@ interface BlockDescription {
   content: BlockData;
 }
 
-interface PageDescrition {
+interface TextDescription {
+  text: string;
+  style: string;
+  extra: string;
+}
+interface ParagraphDescription {
+  content: TextDescription[];
+}
+
+interface PageDescription {
   pageId: string;
-  blocks: BlockDescription[];
+  title: ParagraphDescription;
+  paras: ParagraphDescription[];
 }
 
 // generic type to hold json data

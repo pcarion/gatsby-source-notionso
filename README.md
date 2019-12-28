@@ -7,6 +7,7 @@ A Gatsby source plugin for sourcing data into your [Gatsby](https://www.gatsbyjs
 ## gatsby source development
 
 * [Pixabay Image Source Plugin Tutorial](https://www.gatsbyjs.org/docs/pixabay-source-plugin-tutorial/)
+* [Customizing the GraphQL Schema](https://www.gatsbyjs.org/docs/schema-customization)
 
 ## Notion API
 
