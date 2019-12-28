@@ -1,15 +1,26 @@
-interface PageRecordInformation {
-  id: string;
-  title: string; // TODO: parsing required
-  contentIds: string[];
-  version: number;
-  createdTime: string;
-  lastEditedTime: string;
+type NotionTextAttributes = string[][];
+type NotionText = [string, NotionTextAttributes?][];
+
+interface NotionTextParsedttributes {
+  isBold: boolean;
+  isItalic: boolean;
+  isStrikeThrough: boolean;
+  isCode: boolean;
+  isLink: boolean;
+  withLink?: string;
 }
 
-interface BlockTextMarkdown {
-  kind: 'text_markdown';
-  markdown: string;
+type NotionTextParsed = [string, NotionTextParsedttributes][];
+
+interface BlockText {
+  kind: 'text';
+  text: NotionTextParsed;
+}
+
+interface BlockPage {
+  kind: 'page';
+  title: NotionTextParsed;
+  contentIds: string[];
 }
 
 interface BlockCode {
@@ -23,14 +34,19 @@ interface BlockUnknown {
   blockType: string;
 }
 
-type BlockData = BlockTextMarkdown | BlockCode | BlockUnknown;
+type BlockData = BlockPage | BlockText | BlockCode | BlockUnknown;
 
 interface BlockDescription {
   id: string;
   version: string;
   createdTime: string;
   lastEditedTime: string;
-  data: BlockData;
+  content: BlockData;
+}
+
+interface PageDescrition {
+  pageId: string;
+  blocks: BlockDescription[];
 }
 
 // generic type to hold json data
@@ -39,3 +55,16 @@ interface Json {
   [x: string]: JsonTypes;
 }
 type JsonArray = Array<JsonTypes>;
+
+// plugin configuration data
+interface PluginConfig {
+  rootPageId: string;
+  name: string;
+  tokenv2?: string;
+  debug?: boolean;
+}
+
+interface NotionLoader {
+  loadPage(pageId: string): Promise<void>;
+  getBlockById(blockId: string): Json;
+}

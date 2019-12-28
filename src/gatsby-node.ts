@@ -6,15 +6,10 @@ import {
   // GatsbyResolversCreator,
 } from './types/gatsby';
 
-// import retrievePage from './notion/retrievePage';
-import loadPage from './notion/loadPage';
+import './types/notion';
 
-export interface PluginConfig {
-  pageId: string;
-  name: string;
-  tokenv2?: string;
-  debug?: boolean;
-}
+import notionLoader from './notion/notionLoader';
+import createNodeForPage from './gatsby/createNodeForPage';
 
 const defaultConfig = {
   debug: false,
@@ -25,7 +20,7 @@ export const sourceNodes = async (
   pluginConfig: PluginConfig,
 ): Promise<void> => {
   const config = { ...defaultConfig, ...pluginConfig };
-  const { pageId, name, tokenv2, debug } = config;
+  const { rootPageId, name } = config;
   const {
     actions,
     //    getNode,
@@ -34,9 +29,9 @@ export const sourceNodes = async (
     reporter,
   } = context;
   const { createNode /*, createTypes, createParentChildLink */ } = actions;
-  if (!pageId) {
+  if (!rootPageId) {
     reporter.panic(
-      'gatsby-source-notioso requires a pageId parameter. This is the id of the root page for your notion content',
+      'gatsby-source-notioso requires a rootPageId parameter. This is the id of the root page for your notion content',
     );
     return;
   }
@@ -45,24 +40,35 @@ export const sourceNodes = async (
     reporter.panic('gatsby-source-notioso requires a name parameter.');
     return;
   }
-  const item = {
-    pageId,
-    tokenv2,
-    debug,
-  };
+  const loader = notionLoader(reporter, config.debug);
 
-  await loadPage(pageId, reporter);
+  await createNodeForPage(
+    rootPageId,
+    loader,
+    createNodeId,
+    createNode,
+    createContentDigest,
+    config,
+    reporter,
+  );
+  // const item = {
+  //   pageId,
+  //   tokenv2,
+  //   debug,
+  // };
 
-  const nodeId = createNodeId(pageId);
-  createNode({
-    ...item,
-    id: nodeId,
-    _id: nodeId,
-    parent: null,
-    children: [],
-    internal: {
-      contentDigest: createContentDigest(item),
-      type: `Notion${name}`,
-    },
-  });
+  // await loadPage(pageId, reporter);
+
+  // const nodeId = createNodeId(pageId);
+  // createNode({
+  //   ...item,
+  //   id: nodeId,
+  //   _id: nodeId,
+  //   parent: null,
+  //   children: [],
+  //   internal: {
+  //     contentDigest: createContentDigest(item),
+  //     type: `Notion${name}`,
+  //   },
+  // });
 };

@@ -1,6 +1,8 @@
 import * as _ from 'lodash';
 
 import '../../types/notion';
+import parseNotionText from './parseNotionText';
+
 import { GatsbyReporter } from '../../types/gatsby';
 
 function getFieldAsString(
@@ -24,6 +26,9 @@ type BlockContentParser = (
   reporter: GatsbyReporter,
 ) => BlockData;
 
+function parseNotiontext(title: []): NotionTextParsed {
+  return parseNotionText(title);
+}
 /*
 example:
   type: 'text',
@@ -40,10 +45,27 @@ function parseText(properties: Json, reporter: GatsbyReporter): BlockData {
     reporter.error('missing title property for title text block');
     throw new Error('parsing error');
   }
-  const result: BlockTextMarkdown = {
-    kind: 'text_markdown',
-    markdown: '',
+  const result: BlockText = {
+    kind: 'text',
+    text: parseNotiontext(title as []),
   };
+  return result;
+}
+
+function parsePage(properties: Json, reporter: GatsbyReporter): BlockData {
+  const title = properties && properties.title;
+  if (!title) {
+    reporter.error('missing title property for page text block');
+    throw new Error('parsing error');
+  }
+  const result: BlockPage = {
+    kind: 'page',
+    title: parseNotiontext(title as []),
+    contentIds: [],
+  };
+  ((properties && (properties.content as [])) || []).forEach(id =>
+    result.contentIds.push(id),
+  );
   return result;
 }
 
@@ -58,7 +80,7 @@ const contentParserByTypes: Record<string, BlockContentParser | null> = {
   text: parseText,
   code: null,
   image: null,
-  page: null,
+  page: parsePage,
 };
 
 export default function parseBlock(
@@ -72,9 +94,9 @@ export default function parseBlock(
   const result: BlockDescription = {
     id: getFieldAsString(block, 'id', reporter),
     version: getFieldAsString(block, 'version', reporter),
-    createdTime: getFieldAsString(block, 'resulted_time', reporter),
-    lastEditedTime: getFieldAsString(block, 'last_edresulttime', reporter),
-    data: parser(properties, reporter),
+    createdTime: getFieldAsString(block, 'created_time', reporter),
+    lastEditedTime: getFieldAsString(block, 'last_edited_time', reporter),
+    content: parser(properties, reporter),
   };
   return result;
 }

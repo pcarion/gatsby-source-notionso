@@ -1,4 +1,5 @@
 import notionTextToMarkdown from '../src/notion/parser/notionTextToMarkdown';
+import '../src/notion/parser/parser.types';
 
 describe('notionTextToMarkdown', () => {
   it('should process complex string', () => {
