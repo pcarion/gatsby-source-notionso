@@ -1,7 +1,7 @@
 export default function notionTextToParagraphDescription(
   parsedText: NotionTextParsed,
 ): ParagraphDescription {
-  const parts: TextDescription[] = [];
+  const parts: ContentDescription[] = [];
   parsedText.forEach(([text, atts]) => {
     const style: string[] = [];
     let extra = '';
@@ -19,12 +19,13 @@ export default function notionTextToParagraphDescription(
       extra = atts.withLink || '';
     }
     parts.push({
-      text,
-      style: style.join(''),
-      extra,
+      f1: text,
+      f2: style.join(''),
+      f3: extra,
     });
   });
   return {
+    type: 'text',
     content: parts,
   };
 }

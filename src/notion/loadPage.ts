@@ -1,14 +1,7 @@
 import { GatsbyReporter } from '../types/gatsby';
 import parseBlock from './parser/parseBlock';
 import notionTextToParagraphDescription from './parser/notionTextToParagraphDescription';
-
-function notionTextParsedToString(text: NotionTextParsed): string {
-  const parts: string[] = [];
-  text.forEach(([t, _]) => {
-    parts.push(t);
-  });
-  return parts.join('');
-}
+import notionTextParsedToString from './parser/notionTextParsedToString';
 
 export default async function loadPage(
   pageId: string,
@@ -51,11 +44,27 @@ export default async function loadPage(
         break;
       case 'code':
         paras.push({
+          type: 'code',
           content: [
             {
-              text: notionTextParsedToString(blockData.code),
-              style: 'c',
-              extra: notionTextParsedToString(blockData.language),
+              f1: notionTextParsedToString(blockData.code),
+              f2: 'c',
+              f3: notionTextParsedToString(blockData.language),
+            },
+          ],
+        });
+        break;
+      case 'image':
+        paras.push({
+          type: 'image',
+          content: [
+            {
+              f1: blockData.sourceUrl,
+              f2: 'i',
+              f3: JSON.stringify({
+                width: blockData.width,
+                aspectRatio: blockData.aspectRatio,
+              }),
             },
           ],
         });

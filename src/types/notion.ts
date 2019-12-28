@@ -29,12 +29,19 @@ interface BlockCode {
   language: NotionTextParsed;
 }
 
+interface BlockImage {
+  kind: 'image';
+  sourceUrl: string;
+  width: number;
+  aspectRatio: number;
+}
+
 interface BlockUnknown {
   kind: 'unknown';
   blockType: string;
 }
 
-type BlockData = BlockPage | BlockText | BlockCode | BlockUnknown;
+type BlockData = BlockPage | BlockText | BlockCode | BlockImage | BlockUnknown;
 
 interface BlockDescription {
   id: string;
@@ -44,13 +51,14 @@ interface BlockDescription {
   content: BlockData;
 }
 
-interface TextDescription {
-  text: string;
-  style: string;
-  extra: string;
+interface ContentDescription {
+  f1: string;
+  f2: string;
+  f3: string;
 }
 interface ParagraphDescription {
-  content: TextDescription[];
+  type: 'text' | 'code' | 'image';
+  content: ContentDescription[];
 }
 
 interface PageDescription {
