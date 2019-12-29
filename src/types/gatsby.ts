@@ -25,6 +25,7 @@ export interface GatsbyNode {
     mediaType?: string;
     type: string;
     contentDigest: string;
+    owner: string;
   };
   [key: string]: any;
 }
@@ -80,6 +81,8 @@ export type GatsbyContentDigester = (input: string | object) => string;
 
 export type GatsbyParentChildLinker = (link: GatsbyParentChildLink) => null;
 
+export type GatsbyGetNodes = () => GatsbyNode[];
+
 export interface GatsbyCache {
   name: string;
   cache: {
@@ -109,13 +112,13 @@ export interface GatsbyContext {
   createContentDigest: GatsbyContentDigester;
   store: GatsbyStore;
   getNode: (id: string) => GatsbyNode | undefined;
-  getNodes: () => GatsbyNode[];
+  getNodes: GatsbyGetNodes;
   reporter: GatsbyReporter;
 }
 
-export interface GatsbySsrContext {
-  setHeadComponents: (components: React.ReactElement[]) => undefined;
-}
+// export interface GatsbySsrContext {
+//   setHeadComponents: (components: React.ReactElement[]) => undefined;
+// }
 
 export interface GatsbyActions {
   createTypes: GatsbyTypesCreator;

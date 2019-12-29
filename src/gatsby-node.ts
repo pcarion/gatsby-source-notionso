@@ -10,9 +10,11 @@ import './types/notion';
 
 import notionLoader from './notion/notionLoader';
 import createNodeForPage from './gatsby/createNodeForPage';
+import downloadNotionImages from './gatsby/downloadNotionImages';
 
 const defaultConfig = {
   debug: false,
+  downloadLocal: true,
 };
 
 export const sourceNodes = async (
@@ -20,10 +22,11 @@ export const sourceNodes = async (
   pluginConfig: PluginConfig,
 ): Promise<void> => {
   const config = { ...defaultConfig, ...pluginConfig };
-  const { rootPageId, name } = config;
+  const { rootPageId, name, downloadLocal } = config;
   const {
     actions,
     //    getNode,
+    getNodes,
     createNodeId,
     createContentDigest,
     reporter,
@@ -51,6 +54,10 @@ export const sourceNodes = async (
     config,
     reporter,
   );
+
+  if (downloadLocal) {
+    await downloadNotionImages(getNodes, loader, reporter);
+  }
   // const item = {
   //   pageId,
   //   tokenv2,

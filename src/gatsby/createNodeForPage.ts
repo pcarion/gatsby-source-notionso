@@ -31,6 +31,7 @@ export default async function createNodeForPage(
       internal: {
         contentDigest: createContentDigest(item),
         type: `NotionPage${pluginConfig.name}`,
+        owner: '', // will be set by Gatsbsy itself
       },
     });
   } catch (err) {

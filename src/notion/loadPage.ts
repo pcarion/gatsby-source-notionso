@@ -26,6 +26,7 @@ export default async function loadPage(
   }
 
   const paras: ParagraphDescription[] = [];
+  const imageDescriptions: ImageDescription[] = [];
 
   for (const contentId of content.contentIds) {
     const para: Json = notionLoader.getBlockById(contentId);
@@ -55,7 +56,11 @@ export default async function loadPage(
         });
         break;
       case 'image':
-        await notionLoader.downloadImage(blockData.sourceUrl, contentId);
+        imageDescriptions.push({
+          notionUrl: blockData.sourceUrl,
+          signedUrl: '',
+          contentId,
+        });
         paras.push({
           type: 'image',
           content: [
@@ -80,5 +85,6 @@ export default async function loadPage(
     pageId,
     title: notionTextToParagraphDescription(content.title),
     paras,
+    images: imageDescriptions,
   };
 }

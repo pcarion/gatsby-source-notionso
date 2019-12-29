@@ -17,3 +17,7 @@ Various Notion API implementations:
  * in [Go](https://github.com/kjk/notionapi)
  * in [Python](https://github.com/jamalex/notion-py)
  * in [Kotlin](https://github.com/petersamokhin/knotion-api)
+
+## Other source plugin for Gatsby
+
+* [rich-text-react-renderer for contentful source](https://github.com/contentful/rich-text/tree/master/packages/rich-text-react-renderer)

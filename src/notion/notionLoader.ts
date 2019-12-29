@@ -3,6 +3,13 @@ import axios, { AxiosRequestConfig } from 'axios';
 import { GatsbyReporter } from '../types/gatsby';
 import '../types/notion';
 
+interface NotionApiDownloadInfo {
+  url: string;
+  permissionRecord: {
+    table: string;
+    id: string;
+  };
+}
 export default function notionLoader(
   reporter: GatsbyReporter,
   debug = true,
@@ -75,20 +82,22 @@ export default function notionLoader(
           }
         });
     },
-    downloadImage(imageUrl: string, contentId: string): Promise<void> {
+    downloadImages(images: [string, string][]): Promise<[string, string][]> {
       const urlGetSignedFileUrls =
         'https://www.notion.so/api/v3/getSignedFileUrls';
+      const urls: NotionApiDownloadInfo[] = [];
+      images.forEach(([imageUrl, contentId]) => {
+        urls.push({
+          url: imageUrl,
+          permissionRecord: {
+            table: 'block',
+            id: contentId,
+          },
+        });
+      });
 
       const dataForUrls = {
-        urls: [
-          {
-            url: imageUrl,
-            permissionRecord: {
-              table: 'block',
-              id: contentId,
-            },
-          },
-        ],
+        urls,
       };
 
       const options: AxiosRequestConfig = {
@@ -105,11 +114,14 @@ export default function notionLoader(
         url: urlGetSignedFileUrls,
       };
 
+      const result: [string, string][] = [];
+
       return axios(options)
         .then(function(response) {
-          console.log('Response:');
           if (response.status !== 200) {
-            console.log(response);
+            reporter.error(
+              `Error retrieving images ${images} , status is: ${response.status}`,
+            );
           } else {
             console.log(
               util.inspect(response.data, {
@@ -117,16 +129,25 @@ export default function notionLoader(
                 depth: null,
               }),
             );
+            (
+              (response &&
+                response.data &&
+                (response.data.signedUrls as string[])) ||
+              ([] as string[])
+            ).forEach((signedUrl, index) => {
+              result.push([images[index][0], signedUrl]);
+            });
           }
+          return result;
         })
         .catch(function(error) {
           console.log('Error:');
           console.log(error);
+          return result;
         })
         .finally(function() {
           console.log('DONE');
           console.log(options);
-          // always executed
         });
     },
     getBlockById(blockId: string): Json {

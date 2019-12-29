@@ -61,10 +61,17 @@ interface ParagraphDescription {
   content: ContentDescription[];
 }
 
+interface ImageDescription {
+  notionUrl: string;
+  signedUrl: string;
+  contentId: string;
+}
+
 interface PageDescription {
   pageId: string;
   title: ParagraphDescription;
   paras: ParagraphDescription[];
+  images: ImageDescription[];
 }
 
 // generic type to hold json data
@@ -79,11 +86,12 @@ interface PluginConfig {
   rootPageId: string;
   name: string;
   tokenv2?: string;
+  downloadLocal: boolean;
   debug?: boolean;
 }
 
 interface NotionLoader {
   loadPage(pageId: string): Promise<void>;
-  downloadImage(imageUrl: string, contentId: string): Promise<void>;
+  downloadImages(images: [string, string][]): Promise<[string, string][]>;
   getBlockById(blockId: string): Json;
 }
