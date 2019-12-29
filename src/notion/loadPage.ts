@@ -55,6 +55,7 @@ export default async function loadPage(
         });
         break;
       case 'image':
+        await notionLoader.downloadImage(blockData.sourceUrl, contentId);
         paras.push({
           type: 'image',
           content: [

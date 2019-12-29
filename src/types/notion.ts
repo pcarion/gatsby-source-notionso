@@ -84,5 +84,6 @@ interface PluginConfig {
 
 interface NotionLoader {
   loadPage(pageId: string): Promise<void>;
+  downloadImage(imageUrl: string, contentId: string): Promise<void>;
   getBlockById(blockId: string): Json;
 }
