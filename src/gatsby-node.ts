@@ -57,7 +57,9 @@ export const sourceNodes: GatsbyNode['sourceNodes'] = async (
       createNodeId,
       store,
       cache,
+      createContentDigest,
       loader,
+      config,
       reporter,
     );
   }

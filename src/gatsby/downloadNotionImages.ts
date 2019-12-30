@@ -6,6 +6,7 @@ import {
   NotionLoader,
   ImageDescription,
   GatsbyNotionsoNode,
+  NotionsoPluginOptions,
 } from '../types/notion';
 
 // reference:
@@ -17,7 +18,9 @@ export default async function downloadNotionImages(
   createNodeId: NodePluginArgs['createNodeId'],
   store: NodePluginArgs['store'],
   cache: NodePluginArgs['cache'],
+  createContentDigest: NodePluginArgs['createContentDigest'],
   notionLoader: NotionLoader,
+  pluginConfig: NotionsoPluginOptions,
   reporter: Reporter,
 ): Promise<void> {
   const imagesNodes: GatsbyNotionsoNode[] = getNodes().filter(
@@ -57,6 +60,23 @@ export default async function downloadNotionImages(
         depth: null,
       }),
     );
+    const assetNodeId = createNodeId(notionUrl);
+    const item = {
+      notionUrl,
+      // eslint-disable-next-line @typescript-eslint/camelcase
+      localFile___NODE: fileNode.id,
+    };
+    createNode({
+      ...item,
+      id: assetNodeId,
+      _id: assetNodeId,
+      parent: undefined,
+      children: [],
+      internal: {
+        contentDigest: createContentDigest(item),
+        type: `NotionPageAsset${pluginConfig.name}`,
+      },
+    });
   }
   console.log('@@@ done with downloadNotionImages');
 }
