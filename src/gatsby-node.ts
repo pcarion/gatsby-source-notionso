@@ -1,12 +1,5 @@
-import {
-  GatsbyContext,
-  // GatsbyReporter,
-  // GatsbyNode,
-  // GatsbyOnNodeTypeContext,
-  // GatsbyResolversCreator,
-} from './types/gatsby';
-
-import './types/notion';
+import { GatsbyNode, SourceNodesArgs } from 'gatsby';
+import { NotionsoPluginOptions } from './types/notion';
 
 import notionLoader from './notion/notionLoader';
 import createNodeForPage from './gatsby/createNodeForPage';
@@ -17,9 +10,9 @@ const defaultConfig = {
   downloadLocal: true,
 };
 
-export const sourceNodes = async (
-  context: GatsbyContext,
-  pluginConfig: PluginConfig,
+export const sourceNodes: GatsbyNode['sourceNodes'] = async (
+  context: SourceNodesArgs,
+  pluginConfig: NotionsoPluginOptions,
 ): Promise<void> => {
   const config = { ...defaultConfig, ...pluginConfig };
   const { rootPageId, name, downloadLocal } = config;
@@ -27,6 +20,8 @@ export const sourceNodes = async (
     actions,
     //    getNode,
     getNodes,
+    store,
+    cache,
     createNodeId,
     createContentDigest,
     reporter,
@@ -56,26 +51,14 @@ export const sourceNodes = async (
   );
 
   if (downloadLocal) {
-    await downloadNotionImages(getNodes, loader, reporter);
+    await downloadNotionImages(
+      getNodes,
+      createNode,
+      createNodeId,
+      store,
+      cache,
+      loader,
+      reporter,
+    );
   }
-  // const item = {
-  //   pageId,
-  //   tokenv2,
-  //   debug,
-  // };
-
-  // await loadPage(pageId, reporter);
-
-  // const nodeId = createNodeId(pageId);
-  // createNode({
-  //   ...item,
-  //   id: nodeId,
-  //   _id: nodeId,
-  //   parent: null,
-  //   children: [],
-  //   internal: {
-  //     contentDigest: createContentDigest(item),
-  //     type: `Notion${name}`,
-  //   },
-  // });
 };

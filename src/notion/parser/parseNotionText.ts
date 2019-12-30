@@ -1,4 +1,8 @@
-import './parser.types';
+import {
+  NotionText,
+  NotionTextParsed,
+  NotionTextParsedAttributes,
+} from '../../types/notion';
 
 /*
 Example:
@@ -24,7 +28,7 @@ Example:
 export default function parseNotionText(text: NotionText): NotionTextParsed {
   const result: NotionTextParsed = [];
   text.forEach(([str, att]) => {
-    const parsedAtt: NotionTextParsedttributes = {
+    const parsedAtt: NotionTextParsedAttributes = {
       isBold: false,
       isItalic: false,
       isStrikeThrough: false,

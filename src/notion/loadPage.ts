@@ -1,4 +1,12 @@
-import { GatsbyReporter } from '../types/gatsby';
+import { Reporter } from 'gatsby';
+import {
+  Json,
+  ParagraphDescription,
+  ImageDescription,
+  NotionLoader,
+  PageDescription,
+} from '../types/notion';
+
 import parseBlock from './parser/parseBlock';
 import notionTextToParagraphDescription from './parser/notionTextToParagraphDescription';
 import notionTextParsedToString from './parser/notionTextParsedToString';
@@ -6,7 +14,7 @@ import notionTextParsedToString from './parser/notionTextParsedToString';
 export default async function loadPage(
   pageId: string,
   notionLoader: NotionLoader,
-  reporter: GatsbyReporter,
+  reporter: Reporter,
 ): Promise<PageDescription> {
   // we load the given page
   await notionLoader.loadPage(pageId);

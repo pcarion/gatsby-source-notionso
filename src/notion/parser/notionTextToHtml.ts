@@ -1,3 +1,5 @@
+import { NotionTextParsed } from '../../types/notion';
+
 export default function notionTextToHtml(parsedText: NotionTextParsed): string {
   const parts: string[] = [];
   parsedText.forEach(([text, atts]) => {

@@ -1,3 +1,9 @@
+import {
+  NotionTextParsed,
+  ContentDescription,
+  ParagraphDescription,
+} from '../../types/notion';
+
 export default function notionTextToParagraphDescription(
   parsedText: NotionTextParsed,
 ): ParagraphDescription {

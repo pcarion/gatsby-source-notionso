@@ -1,21 +1,16 @@
-import '../types/notion';
-import {
-  GatsbyNodeIdCreator,
-  GatsbyNodeCreator,
-  GatsbyContentDigester,
-  GatsbyReporter,
-} from '../types/gatsby';
+import { Reporter, Actions, NodePluginArgs } from 'gatsby';
+import { NotionLoader, NotionsoPluginOptions } from '../types/notion';
 
 import loadPage from '../notion/loadPage';
 
 export default async function createNodeForPage(
   pageId: string,
   notionLoader: NotionLoader,
-  createNodeId: GatsbyNodeIdCreator,
-  createNode: GatsbyNodeCreator,
-  createContentDigest: GatsbyContentDigester,
-  pluginConfig: PluginConfig,
-  reporter: GatsbyReporter,
+  createNodeId: NodePluginArgs['createNodeId'],
+  createNode: Actions['createNode'],
+  createContentDigest: NodePluginArgs['createContentDigest'],
+  pluginConfig: NotionsoPluginOptions,
+  reporter: Reporter,
 ): Promise<void> {
   try {
     // loading page
@@ -26,12 +21,11 @@ export default async function createNodeForPage(
       ...item,
       id: nodeId,
       _id: nodeId,
-      parent: null,
+      parent: undefined,
       children: [],
       internal: {
         contentDigest: createContentDigest(item),
         type: `NotionPage${pluginConfig.name}`,
-        owner: '', // will be set by Gatsbsy itself
       },
     });
   } catch (err) {

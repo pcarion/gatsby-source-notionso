@@ -1,15 +1,23 @@
 import * as _ from 'lodash';
+import { Reporter } from 'gatsby';
 
-import '../../types/notion';
+import {
+  Json,
+  NotionTextParsed,
+  BlockCode,
+  BlockPage,
+  BlockImage,
+  BlockData,
+  BlockDescription,
+  BlockText,
+} from '../../types/notion';
 import parseNotionText from './parseNotionText';
 import notionTextParsedToString from './notionTextParsedToString';
-
-import { GatsbyReporter } from '../../types/gatsby';
 
 function getFieldAsString(
   block: Json,
   propName: string,
-  reporter: GatsbyReporter,
+  reporter: Reporter,
 ): string {
   const value = _.get(block, propName, null);
   if (value === null) {
@@ -22,10 +30,7 @@ function getFieldAsString(
 }
 
 // generic type for block content parser
-type BlockContentParser = (
-  properties: Json,
-  reporter: GatsbyReporter,
-) => BlockData;
+type BlockContentParser = (properties: Json, reporter: Reporter) => BlockData;
 
 function parseNotiontext(title: []): NotionTextParsed {
   return parseNotionText(title);
@@ -40,7 +45,7 @@ example:
         [ 'ink', [ [ 'a', 'http://www.pcarion.com' ] ] ],
         [ ' !' ] ] },
 */
-function parseText(block: Json, _reporter: GatsbyReporter): BlockData {
+function parseText(block: Json, _reporter: Reporter): BlockData {
   const properties = block.properties as Json;
 
   const title = (properties && properties.title) || [];
@@ -51,7 +56,7 @@ function parseText(block: Json, _reporter: GatsbyReporter): BlockData {
   return result;
 }
 
-function parseCode(block: Json, _reporter: GatsbyReporter): BlockData {
+function parseCode(block: Json, _reporter: Reporter): BlockData {
   const properties = block.properties as Json;
 
   const title = (properties && properties.title) || [];
@@ -64,7 +69,7 @@ function parseCode(block: Json, _reporter: GatsbyReporter): BlockData {
   return result;
 }
 
-function parseImage(block: Json, _reporter: GatsbyReporter): BlockData {
+function parseImage(block: Json, _reporter: Reporter): BlockData {
   const properties = block.properties as Json;
 
   const source = (properties && properties.source) || [];
@@ -78,7 +83,7 @@ function parseImage(block: Json, _reporter: GatsbyReporter): BlockData {
   return result;
 }
 
-function parsePage(block: Json, reporter: GatsbyReporter): BlockData {
+function parsePage(block: Json, reporter: Reporter): BlockData {
   const properties = block.properties as Json;
   const title = properties && properties.title;
   if (!title) {
@@ -97,7 +102,7 @@ function parsePage(block: Json, reporter: GatsbyReporter): BlockData {
 }
 
 function unknowknBlockParser(type: string): BlockContentParser {
-  return (_block: Json, _reporter: GatsbyReporter): BlockData => ({
+  return (_block: Json, _reporter: Reporter): BlockData => ({
     kind: 'unknown',
     blockType: type,
   });
@@ -112,7 +117,7 @@ const contentParserByTypes: Record<string, BlockContentParser | null> = {
 
 export default function parseBlock(
   block: Json,
-  reporter: GatsbyReporter,
+  reporter: Reporter,
 ): BlockDescription {
   const type = getFieldAsString(block, 'type', reporter);
   const parser = contentParserByTypes[type] || unknowknBlockParser(type);

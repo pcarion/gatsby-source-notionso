@@ -1,7 +1,10 @@
-type NotionTextAttributes = string[][];
-type NotionText = [string, NotionTextAttributes?][];
+import { PluginOptions } from 'gatsby';
 
-interface NotionTextParsedttributes {
+export type NotionTextAttributes = string[][];
+
+export type NotionText = [string, NotionTextAttributes?][];
+
+export interface NotionTextParsedAttributes {
   isBold: boolean;
   isItalic: boolean;
   isStrikeThrough: boolean;
@@ -10,40 +13,45 @@ interface NotionTextParsedttributes {
   withLink?: string;
 }
 
-type NotionTextParsed = [string, NotionTextParsedttributes][];
+export type NotionTextParsed = [string, NotionTextParsedAttributes][];
 
-interface BlockText {
+export interface BlockText {
   kind: 'text';
   text: NotionTextParsed;
 }
 
-interface BlockPage {
+export interface BlockPage {
   kind: 'page';
   title: NotionTextParsed;
   contentIds: string[];
 }
 
-interface BlockCode {
+export interface BlockCode {
   kind: 'code';
   code: NotionTextParsed;
   language: NotionTextParsed;
 }
 
-interface BlockImage {
+export interface BlockImage {
   kind: 'image';
   sourceUrl: string;
   width: number;
   aspectRatio: number;
 }
 
-interface BlockUnknown {
+export interface BlockUnknown {
   kind: 'unknown';
   blockType: string;
 }
 
-type BlockData = BlockPage | BlockText | BlockCode | BlockImage | BlockUnknown;
+export type BlockData =
+  | BlockPage
+  | BlockText
+  | BlockCode
+  | BlockImage
+  | BlockUnknown;
 
-interface BlockDescription {
+export interface BlockDescription {
   id: string;
   version: string;
   createdTime: string;
@@ -51,23 +59,24 @@ interface BlockDescription {
   content: BlockData;
 }
 
-interface ContentDescription {
+export interface ContentDescription {
   f1: string;
   f2: string;
   f3: string;
 }
-interface ParagraphDescription {
+
+export interface ParagraphDescription {
   type: 'text' | 'code' | 'image';
   content: ContentDescription[];
 }
 
-interface ImageDescription {
+export interface ImageDescription {
   notionUrl: string;
   signedUrl: string;
   contentId: string;
 }
 
-interface PageDescription {
+export interface PageDescription {
   pageId: string;
   title: ParagraphDescription;
   paras: ParagraphDescription[];
@@ -75,14 +84,14 @@ interface PageDescription {
 }
 
 // generic type to hold json data
-type JsonTypes = string | number | boolean | Date | Json | JsonArray;
-interface Json {
+export type JsonTypes = string | number | boolean | Date | Json | JsonArray;
+export interface Json {
   [x: string]: JsonTypes;
 }
-type JsonArray = Array<JsonTypes>;
+export type JsonArray = Array<JsonTypes>;
 
 // plugin configuration data
-interface PluginConfig {
+export interface NotionsoPluginOptions extends PluginOptions {
   rootPageId: string;
   name: string;
   tokenv2?: string;
@@ -90,8 +99,22 @@ interface PluginConfig {
   debug?: boolean;
 }
 
-interface NotionLoader {
+export interface NotionLoader {
   loadPage(pageId: string): Promise<void>;
   downloadImages(images: [string, string][]): Promise<[string, string][]>;
   getBlockById(blockId: string): Json;
+}
+
+export interface GatsbyNotionsoNode {
+  id: string; // Gatsby node ID
+  parent?: string | null;
+  children?: string[];
+  internal?: {
+    mediaType?: string;
+    type: string;
+    contentDigest: string;
+    owner: string;
+  };
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  [key: string]: any;
 }

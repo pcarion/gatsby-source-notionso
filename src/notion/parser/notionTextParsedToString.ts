@@ -1,3 +1,5 @@
+import { NotionTextParsed } from '../../types/notion';
+
 export default function notionTextParsedToString(
   text: NotionTextParsed,
 ): string {

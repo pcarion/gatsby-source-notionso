@@ -1,12 +1,12 @@
+import { Reporter } from 'gatsby';
 import * as util from 'util';
 import axios, { AxiosRequestConfig } from 'axios';
-import { GatsbyReporter } from '../types/gatsby';
 
 const urlGetRecordCalues = 'https://www.notion.so/api/v3/getRecordValues';
 
 export default async function retrievePage(
   pageId: string,
-  reporter: GatsbyReporter,
+  reporter: Reporter,
 ): Promise<void> {
   const data = {
     requests: [{ table: 'block', id: pageId }],

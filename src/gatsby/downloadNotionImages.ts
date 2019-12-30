@@ -1,31 +1,34 @@
 import * as util from 'util';
+import { Reporter, Actions, NodePluginArgs } from 'gatsby';
 
-// import { createRemoteFileNode } from 'gatsby-source-filesystem';
-import { GatsbyGetNodes, GatsbyReporter } from '../types/gatsby';
-import '../types/notion';
+import { createRemoteFileNode } from 'gatsby-source-filesystem';
+import {
+  NotionLoader,
+  ImageDescription,
+  GatsbyNotionsoNode,
+} from '../types/notion';
+
+// reference:
+// https://www.gatsbyjs.org/packages/gatsby-source-filesystem/#createremotefilenode
 
 export default async function downloadNotionImages(
-  getNodes: GatsbyGetNodes,
+  getNodes: NodePluginArgs['getNodes'],
+  createNode: Actions['createNode'],
+  createNodeId: NodePluginArgs['createNodeId'],
+  store: NodePluginArgs['store'],
+  cache: NodePluginArgs['cache'],
   notionLoader: NotionLoader,
-  reporter: GatsbyReporter,
+  reporter: Reporter,
 ): Promise<void> {
-  const imagesNodes = getNodes().filter(n => {
-    return n.internal && n.internal.owner === 'gatsby-source-notionso';
-  });
-  console.log('@@@ imagesNodes #', imagesNodes.length);
-
-  //         await notionLoader.downloadImage(blockData.sourceUrl, contentId);
+  const imagesNodes: GatsbyNotionsoNode[] = getNodes().filter(
+    (n: GatsbyNotionsoNode) => {
+      return n.internal && n.internal.owner === 'gatsby-source-notionso';
+    },
+  );
 
   const imagesToDownload: [string, string][] = [];
   await Promise.all(
     imagesNodes.map(async node => {
-      console.log(
-        '@@@ look for images:',
-        util.inspect(node, {
-          colors: true,
-          depth: null,
-        }),
-      );
       ((node.images as ImageDescription[]) || []).forEach(image => {
         console.log(image.notionUrl);
         imagesToDownload.push([image.notionUrl, image.contentId]);
@@ -35,5 +38,25 @@ export default async function downloadNotionImages(
   console.log('@@@ images to download:', imagesToDownload);
   const result = await notionLoader.downloadImages(imagesToDownload);
   reporter.info(`Images for notion source: ${result}`);
+
+  for (const img of result) {
+    const [notionUrl, signedUrl] = img;
+    const fileNode = await createRemoteFileNode({
+      url: signedUrl,
+      store,
+      cache,
+      createNode,
+      createNodeId,
+      reporter,
+    });
+    console.log('@@@ notionUrl:', notionUrl);
+    console.log(
+      '@@@@ fileNode:',
+      util.inspect(fileNode, {
+        colors: true,
+        depth: null,
+      }),
+    );
+  }
   console.log('@@@ done with downloadNotionImages');
 }

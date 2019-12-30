@@ -1,7 +1,7 @@
 import * as util from 'util';
 import axios, { AxiosRequestConfig } from 'axios';
-import { GatsbyReporter } from '../types/gatsby';
-import '../types/notion';
+import { Reporter } from 'gatsby';
+import { Json, NotionLoader } from '../types/notion';
 
 interface NotionApiDownloadInfo {
   url: string;
@@ -11,7 +11,7 @@ interface NotionApiDownloadInfo {
   };
 }
 export default function notionLoader(
-  reporter: GatsbyReporter,
+  reporter: Reporter,
   debug = true,
 ): NotionLoader {
   const _blockDict: Record<string, Json> = {};

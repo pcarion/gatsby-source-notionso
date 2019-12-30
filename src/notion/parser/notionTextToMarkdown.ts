@@ -1,3 +1,7 @@
+import {
+  NotionTextParsed,
+} from '../../types/notion';
+
 export default function notionTextToMarkdown(
   parsedText: NotionTextParsed,
 ): string {
