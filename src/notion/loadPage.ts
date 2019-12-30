@@ -5,6 +5,7 @@ import {
   ImageDescription,
   NotionLoader,
   PageDescription,
+  LinkedPagesDescription,
 } from '../types/notion';
 
 import parseBlock from './parser/parseBlock';
@@ -35,6 +36,7 @@ export default async function loadPage(
 
   const paras: ParagraphDescription[] = [];
   const imageDescriptions: ImageDescription[] = [];
+  const linkedPages: LinkedPagesDescription[] = [];
 
   for (const contentId of content.contentIds) {
     const para: Json = notionLoader.getBlockById(contentId);
@@ -49,7 +51,10 @@ export default async function loadPage(
         paras.push(notionTextToParagraphDescription(blockData.text));
         break;
       case 'page':
-        // TODO: we ignore for now but could be considered a a link
+        linkedPages.push({
+          pageId: blockData.pageId,
+          title: notionTextParsedToString(blockData.title),
+        });
         break;
       case 'code':
         paras.push({
@@ -94,5 +99,6 @@ export default async function loadPage(
     title: notionTextToParagraphDescription(content.title),
     paras,
     images: imageDescriptions,
+    linkedPages,
   };
 }

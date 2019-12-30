@@ -2,10 +2,10 @@ import { Reporter, Actions, NodePluginArgs } from 'gatsby';
 import { NotionLoader, NotionsoPluginOptions } from '../types/notion';
 
 import loadPage from '../notion/loadPage';
+import createNodeForPage from './createNodeForPage';
 
-export default async function createNodeForPage(
+export default async function createNodesFromRootPage(
   pageId: string,
-  title: string,
   notionLoader: NotionLoader,
   createNodeId: NodePluginArgs['createNodeId'],
   createNode: Actions['createNode'],
@@ -17,19 +17,20 @@ export default async function createNodeForPage(
     // loading page
     const item = await loadPage(pageId, notionLoader, reporter);
 
-    const nodeId = createNodeId(pageId);
-    createNode({
-      ...item,
-      id: nodeId,
-      _id: nodeId,
-      title,
-      parent: undefined,
-      children: [],
-      internal: {
-        contentDigest: createContentDigest(item),
-        type: `NotionPage${pluginConfig.name}`,
-      },
-    });
+    // we are interested only by the linked pages from the root page
+    for (const linkedPage of item.linkedPages) {
+      const { pageId, title } = linkedPage;
+      await createNodeForPage(
+        pageId,
+        title,
+        notionLoader,
+        createNodeId,
+        createNode,
+        createContentDigest,
+        pluginConfig,
+        reporter,
+      );
+    }
   } catch (err) {
     reporter.error(`Error loading page: ${pageId} - error is: ${err.message}`);
   }

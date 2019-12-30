@@ -35,16 +35,7 @@ type BlockContentParser = (properties: Json, reporter: Reporter) => BlockData;
 function parseNotiontext(title: []): NotionTextParsed {
   return parseNotionText(title);
 }
-/*
-example:
-  type: 'text',
-  properties:
-    { title:
-      [ [ 'and a ' ],
-        [ 'l', [ [ 'a', 'https://www.pcarion.com' ] ] ],
-        [ 'ink', [ [ 'a', 'http://www.pcarion.com' ] ] ],
-        [ ' !' ] ] },
-*/
+
 function parseText(block: Json, _reporter: Reporter): BlockData {
   const properties = block.properties as Json;
 
@@ -93,6 +84,7 @@ function parsePage(block: Json, reporter: Reporter): BlockData {
   const result: BlockPage = {
     kind: 'page',
     title: parseNotiontext(title as []),
+    pageId: block.id as string,
     contentIds: [],
   };
   ((block && (block.content as [])) || []).forEach(id =>

@@ -2,7 +2,7 @@ import { GatsbyNode, SourceNodesArgs } from 'gatsby';
 import { NotionsoPluginOptions } from './types/notion';
 
 import notionLoader from './notion/notionLoader';
-import createNodeForPage from './gatsby/createNodeForPage';
+import createNodesFromRootPage from './gatsby/createNodesFromRootPage';
 import downloadNotionImages from './gatsby/downloadNotionImages';
 
 const defaultConfig = {
@@ -40,7 +40,7 @@ export const sourceNodes: GatsbyNode['sourceNodes'] = async (
   }
   const loader = notionLoader(reporter, config.debug);
 
-  await createNodeForPage(
+  await createNodesFromRootPage(
     rootPageId,
     loader,
     createNodeId,

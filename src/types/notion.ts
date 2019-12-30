@@ -22,6 +22,7 @@ export interface BlockText {
 
 export interface BlockPage {
   kind: 'page';
+  pageId: string;
   title: NotionTextParsed;
   contentIds: string[];
 }
@@ -81,6 +82,12 @@ export interface PageDescription {
   title: ParagraphDescription;
   paras: ParagraphDescription[];
   images: ImageDescription[];
+  linkedPages: LinkedPagesDescription[];
+}
+
+export interface LinkedPagesDescription {
+  title: string;
+  pageId: string;
 }
 
 // generic type to hold json data
