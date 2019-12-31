@@ -16,7 +16,7 @@ export default async function createNodeForPage(
 ): Promise<void> {
   try {
     // loading page
-    const item = await loadPage(pageId, notionLoader, reporter);
+    const item = await loadPage(pageId, index, notionLoader, reporter);
 
     const nodeId = createNodeId(pageId);
     createNode({

@@ -77,6 +77,7 @@ export interface NotionPageBlock {
 }
 
 export interface ImageDescription {
+  pageId: string;
   notionUrl: string;
   signedUrl: string;
   contentId: string;
@@ -85,6 +86,8 @@ export interface ImageDescription {
 export interface PageDescription {
   pageId: string;
   title: string;
+  slug: string;
+  createdAt: string;
   blocks: NotionPageBlock[];
   images: ImageDescription[];
   linkedPages: LinkedPagesDescription[];
@@ -113,7 +116,9 @@ export interface NotionsoPluginOptions extends PluginOptions {
 
 export interface NotionLoader {
   loadPage(pageId: string): Promise<void>;
-  downloadImages(images: [string, string][]): Promise<[string, string][]>;
+  downloadImages(
+    images: [string, string, string][],
+  ): Promise<[string, string, string][]>;
   getBlockById(blockId: string): Json;
 }
 

@@ -13,6 +13,7 @@ import parseMetaBlock from './parser/parseMetaBlock';
 
 export default async function loadPage(
   pageId: string,
+  indexPage: number,
   notionLoader: NotionLoader,
   reporter: Reporter,
 ): Promise<PageDescription> {
@@ -93,6 +94,7 @@ export default async function loadPage(
         break;
       case 'image':
         imageDescriptions.push({
+          pageId,
           notionUrl: blockData.sourceUrl,
           signedUrl: '',
           contentId,
@@ -128,9 +130,25 @@ export default async function loadPage(
     }
   }
 
+  let slug = `${indexPage}`;
+  let createdAt = new Date().toISOString();
+
+  if (hasMeta) {
+    if (meta['slug']) {
+      slug = meta['slug'];
+    }
+    // TODO: parse date so that it becomes an actual
+    // date in GraphQL
+    if (meta['date']) {
+      createdAt = meta['date'];
+    }
+  }
+
   return {
     pageId,
     title: content.title,
+    slug,
+    createdAt,
     blocks,
     images: imageDescriptions,
     linkedPages,

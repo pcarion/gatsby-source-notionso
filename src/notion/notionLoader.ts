@@ -82,7 +82,9 @@ export default function notionLoader(
           }
         });
     },
-    downloadImages(images: [string, string][]): Promise<[string, string][]> {
+    downloadImages(
+      images: [string, string, string][],
+    ): Promise<[string, string, string][]> {
       const urlGetSignedFileUrls =
         'https://www.notion.so/api/v3/getSignedFileUrls';
       const urls: NotionApiDownloadInfo[] = [];
@@ -114,7 +116,7 @@ export default function notionLoader(
         url: urlGetSignedFileUrls,
       };
 
-      const result: [string, string][] = [];
+      const result: [string, string, string][] = [];
 
       return axios(options)
         .then(function(response) {
@@ -135,7 +137,7 @@ export default function notionLoader(
                 (response.data.signedUrls as string[])) ||
               ([] as string[])
             ).forEach((signedUrl, index) => {
-              result.push([images[index][0], signedUrl]);
+              result.push([images[index][0], signedUrl, images[index][2]]);
             });
           }
           return result;

@@ -15,7 +15,7 @@ export default async function createNodesFromRootPage(
 ): Promise<void> {
   try {
     // loading page
-    const item = await loadPage(pageId, notionLoader, reporter);
+    const item = await loadPage(pageId, 0, notionLoader, reporter);
 
     // we are interested only by the linked pages from the root page
     let index = 0;

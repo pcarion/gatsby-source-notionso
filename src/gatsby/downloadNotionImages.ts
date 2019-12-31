@@ -29,12 +29,12 @@ export default async function downloadNotionImages(
     },
   );
 
-  const imagesToDownload: [string, string][] = [];
+  const imagesToDownload: [string, string, string][] = [];
   await Promise.all(
     imagesNodes.map(async node => {
       ((node.images as ImageDescription[]) || []).forEach(image => {
         console.log(image.notionUrl);
-        imagesToDownload.push([image.notionUrl, image.contentId]);
+        imagesToDownload.push([image.notionUrl, image.contentId, image.pageId]);
       });
     }),
   );
@@ -43,7 +43,7 @@ export default async function downloadNotionImages(
   reporter.info(`Images for notion source: ${result}`);
 
   for (const img of result) {
-    const [notionUrl, signedUrl] = img;
+    const [notionUrl, signedUrl, pageId] = img;
     const fileNode = await createRemoteFileNode({
       url: signedUrl,
       store,
@@ -63,6 +63,7 @@ export default async function downloadNotionImages(
     const assetNodeId = createNodeId(notionUrl);
     const item = {
       notionUrl,
+      pageId,
       // eslint-disable-next-line @typescript-eslint/camelcase
       localFile___NODE: fileNode.id,
     };
