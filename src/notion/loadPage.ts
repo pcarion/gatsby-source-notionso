@@ -9,6 +9,7 @@ import {
 } from '../types/notion';
 
 import parseBlock from './parser/parseBlock';
+import parseMetaBlock from './parser/parseMetaBlock';
 
 export default async function loadPage(
   pageId: string,
@@ -35,6 +36,8 @@ export default async function loadPage(
   const blocks: NotionPageBlock[] = [];
   const imageDescriptions: ImageDescription[] = [];
   const linkedPages: LinkedPagesDescription[] = [];
+  let hasMeta = false;
+  const meta: Record<string, string> = {};
 
   for (const contentId of content.contentIds) {
     const para: Json = notionLoader.getBlockById(contentId);
@@ -68,6 +71,25 @@ export default async function loadPage(
           type: 'code',
           content: [code],
         });
+        break;
+      case 'quote':
+        if (hasMeta) {
+          blocks.push({
+            type: 'quote',
+            content: blockData.quote,
+          });
+        } else {
+          hasMeta = true;
+          // try to parse the block as a meta information definition block
+          if (!parseMetaBlock(blockData.quote, meta)) {
+            // if not parsable, we consider the back as a
+            // a real quote block
+            blocks.push({
+              type: 'quote',
+              content: blockData.quote,
+            });
+          }
+        }
         break;
       case 'image':
         imageDescriptions.push({

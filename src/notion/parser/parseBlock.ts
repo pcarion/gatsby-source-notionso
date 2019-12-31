@@ -6,12 +6,13 @@ import {
   BlockCode,
   BlockPage,
   BlockImage,
+  BlockQuote,
   BlockData,
   BlockText,
   BlockDescription,
 } from '../../types/notion';
 import parseNotionText from './parseNotionText';
-import notionTextParsedToString from './notionTextParsedToString';
+import notionPageTextToString from './notionPageTextToString';
 
 function getFieldAsString(
   block: Json,
@@ -50,7 +51,7 @@ function parseCode(block: Json, _reporter: Reporter): BlockData {
   const result: BlockCode = {
     kind: 'code',
     code: parseNotionText(title as []),
-    language: notionTextParsedToString(parseNotionText(language as [])),
+    language: notionPageTextToString(parseNotionText(language as [])),
   };
   return result;
 }
@@ -61,9 +62,20 @@ function parseImage(block: Json, _reporter: Reporter): BlockData {
   const source = (properties && properties.source) || [];
   const result: BlockImage = {
     kind: 'image',
-    sourceUrl: notionTextParsedToString(parseNotionText(source as [])),
+    sourceUrl: notionPageTextToString(parseNotionText(source as [])),
     width: _.get(block, 'format.block_width', -1) as number,
     aspectRatio: _.get(block, 'format.block_aspect_ratio', -1) as number,
+  };
+  return result;
+}
+
+function parseQuote(block: Json, _reporter: Reporter): BlockData {
+  const properties = block.properties as Json;
+
+  const title = (properties && properties.title) || [];
+  const result: BlockQuote = {
+    kind: 'quote',
+    quote: parseNotionText(title as []),
   };
   return result;
 }
@@ -77,7 +89,7 @@ function parsePage(block: Json, reporter: Reporter): BlockData {
   }
   const result: BlockPage = {
     kind: 'page',
-    title: notionTextParsedToString(parseNotionText(title as [])),
+    title: notionPageTextToString(parseNotionText(title as [])),
     pageId: block.id as string,
     contentIds: [],
   };
@@ -106,6 +118,7 @@ const contentParserByTypes: Record<string, BlockContentParser | null> = {
   code: parseCode,
   image: parseImage,
   page: parsePage,
+  quote: parseQuote,
   // eslint-disable-next-line @typescript-eslint/camelcase
   column_list: ignoreBlockParser('column_list'),
   // eslint-disable-next-line @typescript-eslint/camelcase

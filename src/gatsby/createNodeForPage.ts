@@ -6,6 +6,7 @@ import loadPage from '../notion/loadPage';
 export default async function createNodeForPage(
   pageId: string,
   title: string,
+  index: number,
   notionLoader: NotionLoader,
   createNodeId: NodePluginArgs['createNodeId'],
   createNode: Actions['createNode'],
@@ -20,6 +21,7 @@ export default async function createNodeForPage(
     const nodeId = createNodeId(pageId);
     createNode({
       ...item,
+      indexPage: index,
       id: nodeId,
       _id: nodeId,
       title,

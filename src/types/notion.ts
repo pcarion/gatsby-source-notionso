@@ -22,6 +22,11 @@ export interface BlockCode {
   language: string;
 }
 
+export interface BlockQuote {
+  kind: 'quote';
+  quote: NotionPageText[];
+}
+
 export interface BlockImage {
   kind: 'image';
   sourceUrl: string;
@@ -44,6 +49,7 @@ export type BlockData =
   | BlockText
   | BlockCode
   | BlockImage
+  | BlockQuote
   | BlockIgnore
   | BlockUnknown;
 
@@ -66,7 +72,7 @@ export interface NotionPageText {
 }
 
 export interface NotionPageBlock {
-  type: 'text' | 'code' | 'image';
+  type: 'text' | 'code' | 'image' | 'quote';
   content: NotionPageText[];
 }
 

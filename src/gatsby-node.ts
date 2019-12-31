@@ -105,6 +105,9 @@ export const createSchemaCustomization: GatsbyNode['createSchemaCustomization'] 
     type NotionPage${pluginConfig.name} implements Node @dontInfer {
       pageId: String!
       title: String!
+      indexPage: Int!
+      slug: String!
+      createdAt: Date!
       blocks: [NotionPage${pluginConfig.name}Block!]
       images: [NotionPage${pluginConfig.name}Image!]
       linkedPages: [NotionPage${pluginConfig.name}LinkedPage!]
