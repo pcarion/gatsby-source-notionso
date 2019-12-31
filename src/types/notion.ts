@@ -4,33 +4,22 @@ export type NotionTextAttributes = string[][];
 
 export type NotionText = [string, NotionTextAttributes?][];
 
-export interface NotionTextParsedAttributes {
-  isBold: boolean;
-  isItalic: boolean;
-  isStrikeThrough: boolean;
-  isCode: boolean;
-  isLink: boolean;
-  withLink?: string;
-}
-
-export type NotionTextParsed = [string, NotionTextParsedAttributes][];
-
 export interface BlockText {
   kind: 'text';
-  text: NotionTextParsed;
+  text: NotionPageText[];
 }
 
 export interface BlockPage {
   kind: 'page';
   pageId: string;
-  title: NotionTextParsed;
+  title: string;
   contentIds: string[];
 }
 
 export interface BlockCode {
   kind: 'code';
-  code: NotionTextParsed;
-  language: NotionTextParsed;
+  code: NotionPageText[];
+  language: string;
 }
 
 export interface BlockImage {
@@ -45,11 +34,17 @@ export interface BlockUnknown {
   blockType: string;
 }
 
+export interface BlockIgnore {
+  kind: 'ignore';
+  blockType: string;
+}
+
 export type BlockData =
   | BlockPage
   | BlockText
   | BlockCode
   | BlockImage
+  | BlockIgnore
   | BlockUnknown;
 
 export interface BlockDescription {
@@ -60,15 +55,19 @@ export interface BlockDescription {
   content: BlockData;
 }
 
-export interface ContentDescription {
-  f1: string;
-  f2: string;
-  f3: string;
+export interface NotionPageTextAtt {
+  att: string;
+  value?: string;
 }
 
-export interface ParagraphDescription {
+export interface NotionPageText {
+  text: string;
+  atts: NotionPageTextAtt[];
+}
+
+export interface NotionPageBlock {
   type: 'text' | 'code' | 'image';
-  content: ContentDescription[];
+  content: NotionPageText[];
 }
 
 export interface ImageDescription {
@@ -79,8 +78,8 @@ export interface ImageDescription {
 
 export interface PageDescription {
   pageId: string;
-  title: ParagraphDescription;
-  paras: ParagraphDescription[];
+  title: string;
+  blocks: NotionPageBlock[];
   images: ImageDescription[];
   linkedPages: LinkedPagesDescription[];
 }

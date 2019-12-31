@@ -1,4 +1,8 @@
-import { GatsbyNode, SourceNodesArgs } from 'gatsby';
+import {
+  GatsbyNode,
+  SourceNodesArgs,
+  CreateSchemaCustomizationArgs,
+} from 'gatsby';
 import { NotionsoPluginOptions } from './types/notion';
 
 import notionLoader from './notion/notionLoader';
@@ -26,16 +30,16 @@ export const sourceNodes: GatsbyNode['sourceNodes'] = async (
     createContentDigest,
     reporter,
   } = context;
-  const { createNode /*, createTypes, createParentChildLink */ } = actions;
+  const { createNode } = actions;
   if (!rootPageId) {
     reporter.panic(
-      'gatsby-source-notioso requires a rootPageId parameter. This is the id of the root page for your notion content',
+      'gatsby-source-notionso requires a rootPageId parameter. This is the id of the root page for your notion content',
     );
     return;
   }
 
   if (!name) {
-    reporter.panic('gatsby-source-notioso requires a name parameter.');
+    reporter.panic('gatsby-source-notionso requires a name parameter.');
     return;
   }
   const loader = notionLoader(reporter, config.debug);
@@ -63,4 +67,48 @@ export const sourceNodes: GatsbyNode['sourceNodes'] = async (
       reporter,
     );
   }
+};
+
+export const createSchemaCustomization: GatsbyNode['createSchemaCustomization'] = async (
+  context: CreateSchemaCustomizationArgs,
+  pluginConfig: NotionsoPluginOptions,
+): Promise<void> => {
+  const { actions } = context;
+  const { createTypes } = actions;
+  const typeDefs = `
+    type NotionPage${pluginConfig.name}LinkedPage {
+      title: String!
+      pageId: String!
+    }
+
+    type NotionPage${pluginConfig.name}Image {
+      notionUrl: String!
+      signedUrl: String!
+      contentId: String!
+    }
+
+    type NotionPage${pluginConfig.name}Att {
+      att: String!
+      value: String
+    }
+
+    type NotionPage${pluginConfig.name}Text {
+      text: String!
+      atts: [NotionPage${pluginConfig.name}Att!]
+    }
+
+    type NotionPage${pluginConfig.name}Block {
+      type: String!
+      content: [NotionPage${pluginConfig.name}Text!]
+    }
+
+    type NotionPage${pluginConfig.name} implements Node @dontInfer {
+      pageId: String!
+      title: String!
+      blocks: [NotionPage${pluginConfig.name}Block!]
+      images: [NotionPage${pluginConfig.name}Image!]
+      linkedPages: [NotionPage${pluginConfig.name}LinkedPage!]
+    }
+  `;
+  createTypes(typeDefs);
 };

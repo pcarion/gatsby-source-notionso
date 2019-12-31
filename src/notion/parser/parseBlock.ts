@@ -3,13 +3,12 @@ import { Reporter } from 'gatsby';
 
 import {
   Json,
-  NotionTextParsed,
   BlockCode,
   BlockPage,
   BlockImage,
   BlockData,
-  BlockDescription,
   BlockText,
+  BlockDescription,
 } from '../../types/notion';
 import parseNotionText from './parseNotionText';
 import notionTextParsedToString from './notionTextParsedToString';
@@ -32,17 +31,13 @@ function getFieldAsString(
 // generic type for block content parser
 type BlockContentParser = (properties: Json, reporter: Reporter) => BlockData;
 
-function parseNotiontext(title: []): NotionTextParsed {
-  return parseNotionText(title);
-}
-
 function parseText(block: Json, _reporter: Reporter): BlockData {
   const properties = block.properties as Json;
 
   const title = (properties && properties.title) || [];
   const result: BlockText = {
     kind: 'text',
-    text: parseNotiontext(title as []),
+    text: parseNotionText(title as []),
   };
   return result;
 }
@@ -54,8 +49,8 @@ function parseCode(block: Json, _reporter: Reporter): BlockData {
   const language = (properties && properties.language) || [];
   const result: BlockCode = {
     kind: 'code',
-    code: parseNotiontext(title as []),
-    language: parseNotiontext(language as []),
+    code: parseNotionText(title as []),
+    language: notionTextParsedToString(parseNotionText(language as [])),
   };
   return result;
 }
@@ -66,11 +61,10 @@ function parseImage(block: Json, _reporter: Reporter): BlockData {
   const source = (properties && properties.source) || [];
   const result: BlockImage = {
     kind: 'image',
-    sourceUrl: notionTextParsedToString(parseNotiontext(source as [])),
+    sourceUrl: notionTextParsedToString(parseNotionText(source as [])),
     width: _.get(block, 'format.block_width', -1) as number,
     aspectRatio: _.get(block, 'format.block_aspect_ratio', -1) as number,
   };
-  console.log('@@@@ image:', result);
   return result;
 }
 
@@ -83,7 +77,7 @@ function parsePage(block: Json, reporter: Reporter): BlockData {
   }
   const result: BlockPage = {
     kind: 'page',
-    title: parseNotiontext(title as []),
+    title: notionTextParsedToString(parseNotionText(title as [])),
     pageId: block.id as string,
     contentIds: [],
   };
@@ -100,11 +94,22 @@ function unknowknBlockParser(type: string): BlockContentParser {
   });
 }
 
+function ignoreBlockParser(type: string): BlockContentParser {
+  return (_block: Json, _reporter: Reporter): BlockData => ({
+    kind: 'ignore',
+    blockType: type,
+  });
+}
+
 const contentParserByTypes: Record<string, BlockContentParser | null> = {
   text: parseText,
   code: parseCode,
   image: parseImage,
   page: parsePage,
+  // eslint-disable-next-line @typescript-eslint/camelcase
+  column_list: ignoreBlockParser('column_list'),
+  // eslint-disable-next-line @typescript-eslint/camelcase
+  bulleted_list: ignoreBlockParser('bulleted_list'),
 };
 
 export default function parseBlock(

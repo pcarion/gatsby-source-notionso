@@ -1,11 +1,11 @@
-import { NotionTextParsed } from '../../types/notion';
+import { NotionPageText } from '../../types/notion';
 
 export default function notionTextParsedToString(
-  text: NotionTextParsed,
+  text: NotionPageText[],
 ): string {
   const parts: string[] = [];
-  text.forEach(([t, _]) => {
-    parts.push(t);
+  text.forEach(t => {
+    parts.push(t.text);
   });
   return parts.join('');
 }

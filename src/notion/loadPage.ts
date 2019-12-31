@@ -1,7 +1,7 @@
 import { Reporter } from 'gatsby';
 import {
   Json,
-  ParagraphDescription,
+  NotionPageBlock,
   ImageDescription,
   NotionLoader,
   PageDescription,
@@ -9,8 +9,6 @@ import {
 } from '../types/notion';
 
 import parseBlock from './parser/parseBlock';
-import notionTextToParagraphDescription from './parser/notionTextToParagraphDescription';
-import notionTextParsedToString from './parser/notionTextParsedToString';
 
 export default async function loadPage(
   pageId: string,
@@ -34,7 +32,7 @@ export default async function loadPage(
     throw new Error('invalid page');
   }
 
-  const paras: ParagraphDescription[] = [];
+  const blocks: NotionPageBlock[] = [];
   const imageDescriptions: ImageDescription[] = [];
   const linkedPages: LinkedPagesDescription[] = [];
 
@@ -48,24 +46,27 @@ export default async function loadPage(
     const blockData = block.content;
     switch (blockData.kind) {
       case 'text':
-        paras.push(notionTextToParagraphDescription(blockData.text));
+        blocks.push({
+          type: 'text',
+          content: blockData.text,
+        });
         break;
       case 'page':
         linkedPages.push({
           pageId: blockData.pageId,
-          title: notionTextParsedToString(blockData.title),
+          title: blockData.title,
         });
         break;
       case 'code':
-        paras.push({
+        const code = blockData.code[0];
+        const language = blockData.language;
+        code.atts.push({
+          att: '_language',
+          value: language,
+        });
+        blocks.push({
           type: 'code',
-          content: [
-            {
-              f1: notionTextParsedToString(blockData.code),
-              f2: 'c',
-              f3: notionTextParsedToString(blockData.language),
-            },
-          ],
+          content: [code],
         });
         break;
       case 'image':
@@ -74,21 +75,32 @@ export default async function loadPage(
           signedUrl: '',
           contentId,
         });
-        paras.push({
+        blocks.push({
           type: 'image',
           content: [
             {
-              f1: blockData.sourceUrl,
-              f2: 'i',
-              f3: JSON.stringify({
-                width: blockData.width,
-                aspectRatio: blockData.aspectRatio,
-              }),
+              text: '',
+              atts: [
+                {
+                  att: '_sourceUrl',
+                  value: blockData.sourceUrl,
+                },
+                {
+                  att: '_width',
+                  value: `${blockData.width}`,
+                },
+                {
+                  att: '_aspectRatio',
+                  value: `${blockData.aspectRatio}`,
+                },
+              ],
             },
           ],
         });
         break;
-
+      case 'ignore':
+        // guess what... we ignore that one
+        break;
       default:
         reporter.error(`unknown block: ${JSON.stringify(blockData)}`);
     }
@@ -96,8 +108,8 @@ export default async function loadPage(
 
   return {
     pageId,
-    title: notionTextToParagraphDescription(content.title),
-    paras,
+    title: content.title,
+    blocks,
     images: imageDescriptions,
     linkedPages,
   };
