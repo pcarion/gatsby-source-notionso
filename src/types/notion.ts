@@ -1,121 +1,49 @@
 import { PluginOptions } from 'gatsby';
 
-export type NotionTextAttributes = string[][];
-
-export type NotionText = [string, NotionTextAttributes?][];
-
-export interface BlockText {
-  kind: 'text';
-  text: NotionPageText[];
-}
-
-export interface BlockHeader {
-  kind: 'header1' | 'header2' | 'header3';
-  text: NotionPageText[];
-}
-
-export interface BlockBulletedList {
-  kind: 'bulleted_list';
-  text: NotionPageText[];
-}
-
-export interface BlockPage {
-  kind: 'page';
-  pageId: string;
-  title: string;
-  contentIds: string[];
-}
-
-export interface BlockCode {
-  kind: 'code';
-  code: NotionPageText[];
-  language: string;
-}
-
-export interface BlockQuote {
-  kind: 'quote';
-  quote: NotionPageText[];
-}
-
-export interface BlockImage {
-  kind: 'image';
-  sourceUrl: string;
-  width: number;
-  aspectRatio: number;
-}
-
-export interface BlockUnknown {
-  kind: 'unknown';
-  blockType: string;
-}
-
-export interface BlockIgnore {
-  kind: 'ignore';
-  blockType: string;
-}
-
-export type BlockData =
-  | BlockPage
-  | BlockText
-  | BlockCode
-  | BlockImage
-  | BlockQuote
-  | BlockBulletedList
-  | BlockHeader
-  | BlockIgnore
-  | BlockUnknown;
-
-export interface BlockDescription {
-  id: string;
-  version: string;
-  createdTime: string;
-  lastEditedTime: string;
-  content: BlockData;
-}
-
-export interface NotionPageTextAtt {
+export interface NotionPageAtt {
   att: string;
   value?: string;
 }
 
 export interface NotionPageText {
   text: string;
-  atts: NotionPageTextAtt[];
+  atts: NotionPageAtt[];
+}
+
+export interface NotionPageProperty {
+  propName: string;
+  value: NotionPageText[];
 }
 
 export interface NotionPageBlock {
-  type:
-    | 'text'
-    | 'code'
-    | 'image'
-    | 'quote'
-    | 'bulleted_list'
-    | 'header1'
-    | 'header2'
-    | 'header3';
-  content: NotionPageText[];
+  type: string;
+  blockId: string;
+  properties: NotionPageProperty[];
+  attributes: NotionPageAtt[];
+  blockIds: string[];
 }
 
-export interface ImageDescription {
+export interface NotionPageImage {
   pageId: string;
   notionUrl: string;
   signedUrl: string;
   contentId: string;
 }
 
-export interface PageDescription {
+export interface NotionPageLinkedPage {
+  title: string;
+  pageId: string;
+}
+
+export interface NotionPageDescription {
   pageId: string;
   title: string;
+  indexPage: number;
   slug: string;
   createdAt: string;
   blocks: NotionPageBlock[];
-  images: ImageDescription[];
-  linkedPages: LinkedPagesDescription[];
-}
-
-export interface LinkedPagesDescription {
-  title: string;
-  pageId: string;
+  images: NotionPageImage[];
+  linkedPages: NotionPageLinkedPage[];
 }
 
 // generic type to hold json data
@@ -139,7 +67,9 @@ export interface NotionLoader {
   downloadImages(
     images: [string, string, string][],
   ): Promise<[string, string, string][]>;
-  getBlockById(blockId: string): Json;
+  getBlockById(blockId: string): NotionPageBlock | undefined;
+  getBlocks(copyTo: NotionPageBlock[]): void;
+  reset(): void;
 }
 
 export interface GatsbyNotionsoNode {

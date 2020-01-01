@@ -1,146 +1,105 @@
 import { Reporter } from 'gatsby';
 import {
-  Json,
   NotionPageBlock,
-  ImageDescription,
   NotionLoader,
-  PageDescription,
-  LinkedPagesDescription,
+  NotionPageDescription,
+  NotionPageImage,
+  NotionPageLinkedPage,
+  NotionPageText,
 } from '../types/notion';
 
-import parseBlock from './parser/parseBlock';
 import parseMetaBlock from './parser/parseMetaBlock';
+import notionPageTextToString from './parser/notionPageTextToString';
+
+function getPropertyAsString(
+  block: NotionPageBlock,
+  propName: string,
+  defaultValue: '',
+): string {
+  const property = block.properties.find(p => p.propName === propName);
+  if (!property) {
+    return defaultValue;
+  }
+  return notionPageTextToString(property.value);
+}
+
+function getPropertyText(
+  block: NotionPageBlock,
+  propName: string,
+): NotionPageText[] | null {
+  const property = block.properties.find(p => p.propName === propName);
+  if (!property) {
+    return null;
+  }
+  return property.value;
+}
 
 export default async function loadPage(
   pageId: string,
   indexPage: number,
   notionLoader: NotionLoader,
   reporter: Reporter,
-): Promise<PageDescription> {
+): Promise<NotionPageDescription> {
   // we load the given page
   await notionLoader.loadPage(pageId);
 
   // and parse its description block
-  const page: Json = notionLoader.getBlockById(pageId);
+  const page = notionLoader.getBlockById(pageId);
   if (!page) {
     reporter.error(`could not retreieve page with id: ${pageId}`);
     throw Error('error retrieving page');
   }
 
-  const description = parseBlock(page.value as Json, reporter);
-
-  const content = description.content;
-  if (content.kind !== 'page') {
+  if (page.type !== 'page') {
     throw new Error('invalid page');
   }
 
-  const blocks: NotionPageBlock[] = [];
-  const imageDescriptions: ImageDescription[] = [];
-  const linkedPages: LinkedPagesDescription[] = [];
+  const imageDescriptions: NotionPageImage[] = [];
+  const linkedPages: NotionPageLinkedPage[] = [];
   let hasMeta = false;
   const meta: Record<string, string> = {};
 
-  for (const contentId of content.contentIds) {
-    const para: Json = notionLoader.getBlockById(contentId);
-    if (!para) {
-      reporter.error(`could not retreieve para with id: ${contentId}`);
+  for (const blockId of page.blockIds) {
+    const block = notionLoader.getBlockById(blockId);
+    if (!block) {
+      reporter.error(`could not retreieve para with id: ${blockId}`);
       throw Error('error retrieving paragraph');
     }
-    const block = parseBlock(para.value as Json, reporter);
-    const blockData = block.content;
-    switch (blockData.kind) {
-      case 'text':
-        blocks.push({
-          type: 'text',
-          content: blockData.text,
-        });
-        break;
-      case 'bulleted_list':
-        blocks.push({
-          type: 'bulleted_list',
-          content: blockData.text,
-        });
-        break;
-      case 'header1':
-      case 'header2':
-      case 'header3':
-        blocks.push({
-          type: blockData.kind,
-          content: blockData.text,
-        });
-        break;
+    switch (block.type) {
       case 'page':
         linkedPages.push({
-          pageId: blockData.pageId,
-          title: blockData.title,
-        });
-        break;
-      case 'code':
-        const code = blockData.code[0];
-        const language = blockData.language;
-        code.atts.push({
-          att: '_language',
-          value: language,
-        });
-        blocks.push({
-          type: 'code',
-          content: [code],
+          pageId: block.blockId,
+          title: getPropertyAsString(block, 'title', ''),
         });
         break;
       case 'quote':
-        if (hasMeta) {
-          blocks.push({
-            type: 'quote',
-            content: blockData.quote,
-          });
-        } else {
+        if (!hasMeta) {
           hasMeta = true;
+          const text = getPropertyText(block, 'title');
           // try to parse the block as a meta information definition block
-          if (!parseMetaBlock(blockData.quote, meta)) {
-            // if not parsable, we consider the back as a
-            // a real quote block
-            blocks.push({
-              type: 'quote',
-              content: blockData.quote,
-            });
+          if (text) {
+            if (parseMetaBlock(text, meta)) {
+              // if we were able to parse the block, we change its type
+              // (so that it is not rendered)
+              block.type = '_meta';
+            }
           }
         }
         break;
       case 'image':
         imageDescriptions.push({
           pageId,
-          notionUrl: blockData.sourceUrl,
+          notionUrl: getPropertyAsString(block, 'source', ''),
           signedUrl: '',
-          contentId,
-        });
-        blocks.push({
-          type: 'image',
-          content: [
-            {
-              text: '',
-              atts: [
-                {
-                  att: '_sourceUrl',
-                  value: blockData.sourceUrl,
-                },
-                {
-                  att: '_width',
-                  value: `${blockData.width}`,
-                },
-                {
-                  att: '_aspectRatio',
-                  value: `${blockData.aspectRatio}`,
-                },
-              ],
-            },
-          ],
+          contentId: block.blockId,
         });
         break;
       case 'ignore':
         // guess what... we ignore that one
         break;
       default:
-        reporter.error(`unknown block: ${JSON.stringify(blockData)}`);
+        // we keep the record by defaut
+        break;
     }
   }
 
@@ -158,13 +117,16 @@ export default async function loadPage(
     }
   }
 
-  return {
+  const item: NotionPageDescription = {
     pageId,
-    title: content.title,
+    title: getPropertyAsString(page, 'title', ''),
+    indexPage,
     slug,
     createdAt,
-    blocks,
+    blocks: [],
     images: imageDescriptions,
     linkedPages,
   };
+  notionLoader.getBlocks(item.blocks);
+  return item;
 }

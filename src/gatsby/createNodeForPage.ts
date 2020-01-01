@@ -1,3 +1,4 @@
+// import * as util from 'util';
 import { Reporter, Actions, NodePluginArgs } from 'gatsby';
 import { NotionLoader, NotionsoPluginOptions } from '../types/notion';
 
@@ -17,7 +18,6 @@ export default async function createNodeForPage(
   try {
     // loading page
     const item = await loadPage(pageId, index, notionLoader, reporter);
-
     const nodeId = createNodeId(pageId);
     createNode({
       ...item,
@@ -32,6 +32,13 @@ export default async function createNodeForPage(
         type: `NotionPage${pluginConfig.name}`,
       },
     });
+    // console.log('@@@@ loadPage:pageId:', pageId);
+    // console.log(
+    //   util.inspect(item, {
+    //     colors: true,
+    //     depth: null,
+    //   }),
+    // );
   } catch (err) {
     reporter.error(`Error loading page: ${pageId} - error is: ${err.message}`);
   }

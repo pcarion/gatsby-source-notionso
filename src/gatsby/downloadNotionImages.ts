@@ -4,9 +4,9 @@ import { Reporter, Actions, NodePluginArgs } from 'gatsby';
 import { createRemoteFileNode } from 'gatsby-source-filesystem';
 import {
   NotionLoader,
-  ImageDescription,
   GatsbyNotionsoNode,
   NotionsoPluginOptions,
+  NotionPageImage,
 } from '../types/notion';
 
 // reference:
@@ -32,7 +32,7 @@ export default async function downloadNotionImages(
   const imagesToDownload: [string, string, string][] = [];
   await Promise.all(
     imagesNodes.map(async node => {
-      ((node.images as ImageDescription[]) || []).forEach(image => {
+      ((node.images as NotionPageImage[]) || []).forEach(image => {
         console.log(image.notionUrl);
         imagesToDownload.push([image.notionUrl, image.contentId, image.pageId]);
       });

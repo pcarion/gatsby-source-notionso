@@ -5,9 +5,7 @@ import {
 } from 'gatsby';
 import { NotionsoPluginOptions } from './types/notion';
 
-import notionLoader from './notion/notionLoader';
 import createNodesFromRootPage from './gatsby/createNodesFromRootPage';
-import downloadNotionImages from './gatsby/downloadNotionImages';
 
 const defaultConfig = {
   debug: false,
@@ -19,10 +17,9 @@ export const sourceNodes: GatsbyNode['sourceNodes'] = async (
   pluginConfig: NotionsoPluginOptions,
 ): Promise<void> => {
   const config = { ...defaultConfig, ...pluginConfig };
-  const { rootPageId, name, downloadLocal } = config;
+  const { rootPageId, name } = config;
   const {
     actions,
-    //    getNode,
     getNodes,
     store,
     cache,
@@ -42,31 +39,17 @@ export const sourceNodes: GatsbyNode['sourceNodes'] = async (
     reporter.panic('gatsby-source-notionso requires a name parameter.');
     return;
   }
-  const loader = notionLoader(reporter, config.debug);
-
   await createNodesFromRootPage(
     rootPageId,
-    loader,
     createNodeId,
     createNode,
     createContentDigest,
+    getNodes,
+    store,
+    cache,
     config,
     reporter,
   );
-
-  if (downloadLocal) {
-    await downloadNotionImages(
-      getNodes,
-      createNode,
-      createNodeId,
-      store,
-      cache,
-      createContentDigest,
-      loader,
-      config,
-      reporter,
-    );
-  }
 };
 
 export const createSchemaCustomization: GatsbyNode['createSchemaCustomization'] = async (
@@ -89,7 +72,7 @@ export const createSchemaCustomization: GatsbyNode['createSchemaCustomization'] 
 
     type NotionPage${pluginConfig.name}Att {
       att: String!
-      value: String
+      value: String!
     }
 
     type NotionPage${pluginConfig.name}Text {
@@ -97,9 +80,17 @@ export const createSchemaCustomization: GatsbyNode['createSchemaCustomization'] 
       atts: [NotionPage${pluginConfig.name}Att!]
     }
 
+    type NotionPage${pluginConfig.name}Property {
+      propName: String!
+      value: [NotionPage${pluginConfig.name}Text!]
+    }
+
     type NotionPage${pluginConfig.name}Block {
       type: String!
-      content: [NotionPage${pluginConfig.name}Text!]
+      blockId: String!
+      properties: [NotionPage${pluginConfig.name}Property!]
+      attributes: [NotionPage${pluginConfig.name}Att!]
+      blockIds: [String!]
     }
 
     type NotionPage${pluginConfig.name} implements Node @dontInfer {

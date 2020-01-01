@@ -1,7 +1,8 @@
 import * as util from 'util';
 import axios, { AxiosRequestConfig } from 'axios';
 import { Reporter } from 'gatsby';
-import { Json, NotionLoader } from '../types/notion';
+import { NotionLoader, NotionPageBlock } from '../types/notion';
+import recordMapToBlocks from './parser/recordMapToBlocks';
 
 interface NotionApiDownloadInfo {
   url: string;
@@ -14,7 +15,7 @@ export default function notionLoader(
   reporter: Reporter,
   debug = true,
 ): NotionLoader {
-  const _blockDict: Record<string, Json> = {};
+  let _blocks: NotionPageBlock[] = [];
 
   return {
     loadPage: async (pageId: string): Promise<void> => {
@@ -61,15 +62,11 @@ export default function notionLoader(
             });
             reporter.info(`response is: ${data}`);
           }
-          // we store the blocks
-          Object.keys(
-            response &&
-              response.data &&
-              response.data.recordMap &&
-              response.data.recordMap.block,
-          ).forEach(key => {
-            _blockDict[key] = response.data.recordMap.block[key];
-          });
+          // we parse the blocks
+          recordMapToBlocks(
+            (response && response.data && response.data.recordMap) || {},
+            _blocks,
+          );
         })
         .catch(function(error) {
           reporter.error(`Error retrieving data: ${error}`);
@@ -152,8 +149,14 @@ export default function notionLoader(
           console.log(options);
         });
     },
-    getBlockById(blockId: string): Json {
-      return _blockDict[blockId];
+    getBlockById(blockId: string): NotionPageBlock | undefined {
+      return _blocks.find(b => b.blockId === blockId);
+    },
+    getBlocks(copyTo: NotionPageBlock[]): void {
+      _blocks.forEach(b => copyTo.push(b));
+    },
+    reset(): void {
+      _blocks = [];
     },
   };
 }
