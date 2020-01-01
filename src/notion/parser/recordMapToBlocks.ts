@@ -50,11 +50,11 @@ function recordToBlock(value: Json): NotionPageBlock | null {
   if (block.type === 'image') {
     block.attributes.push({
       att: 'width',
-      value: _.get(block, 'format.block_width', '-1'),
+      value: _.get(value as object, 'format.block_width', '-1'),
     });
     block.attributes.push({
-      att: 'width',
-      value: _.get(block, 'format.block_aspect_ratio', '-1'),
+      att: 'aspectRatio',
+      value: _.get(value as object, 'format.block_aspect_ratio', '-1'),
     });
   }
   return block;
