@@ -72,7 +72,7 @@ export const createSchemaCustomization: GatsbyNode['createSchemaCustomization'] 
 
     type NotionPage${pluginConfig.name}Att {
       att: String!
-      value: String!
+      value: String
     }
 
     type NotionPage${pluginConfig.name}Text {

@@ -36,6 +36,7 @@ function getPropertyText(
 
 export default async function loadPage(
   pageId: string,
+  rootPageId: string,
   indexPage: number,
   notionLoader: NotionLoader,
   reporter: Reporter,
@@ -127,6 +128,6 @@ export default async function loadPage(
     images: imageDescriptions,
     linkedPages,
   };
-  notionLoader.getBlocks(item.blocks);
+  notionLoader.getBlocks(item.blocks, rootPageId);
   return item;
 }

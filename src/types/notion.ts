@@ -68,7 +68,7 @@ export interface NotionLoader {
     images: [string, string, string][],
   ): Promise<[string, string, string][]>;
   getBlockById(blockId: string): NotionPageBlock | undefined;
-  getBlocks(copyTo: NotionPageBlock[]): void;
+  getBlocks(copyTo: NotionPageBlock[], pageId: string): void;
   reset(): void;
 }
 

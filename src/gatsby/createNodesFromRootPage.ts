@@ -7,7 +7,7 @@ import createNodeForPage from './createNodeForPage';
 import downloadNotionImages from '../gatsby/downloadNotionImages';
 
 export default async function createNodesFromRootPage(
-  pageId: string,
+  rootPageId: string,
   createNodeId: NodePluginArgs['createNodeId'],
   createNode: Actions['createNode'],
   createContentDigest: NodePluginArgs['createContentDigest'],
@@ -22,7 +22,7 @@ export default async function createNodesFromRootPage(
 
     const loader = notionLoader(reporter, debug);
     // loading page
-    const item = await loadPage(pageId, 0, loader, reporter);
+    const item = await loadPage(rootPageId, '', 0, loader, reporter);
 
     // we are interested only by the linked pages from the root page
     let index = 0;
@@ -36,6 +36,7 @@ export default async function createNodesFromRootPage(
 
       await createNodeForPage(
         pageId,
+        rootPageId,
         title,
         index,
         loader,
@@ -60,6 +61,8 @@ export default async function createNodesFromRootPage(
       reporter,
     );
   } catch (err) {
-    reporter.error(`Error loading page: ${pageId} - error is: ${err.message}`);
+    reporter.error(
+      `Error loading root page: ${rootPageId} - error is: ${err.message}`,
+    );
   }
 }

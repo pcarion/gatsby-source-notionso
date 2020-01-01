@@ -152,8 +152,9 @@ export default function notionLoader(
     getBlockById(blockId: string): NotionPageBlock | undefined {
       return _blocks.find(b => b.blockId === blockId);
     },
-    getBlocks(copyTo: NotionPageBlock[]): void {
-      _blocks.forEach(b => copyTo.push(b));
+    getBlocks(copyTo: NotionPageBlock[], pageId: string): void {
+      //_blocks.forEach(b => copyTo.push(b));
+      _blocks.filter(b => b.blockId !== pageId).forEach(b => copyTo.push(b));
     },
     reset(): void {
       _blocks = [];

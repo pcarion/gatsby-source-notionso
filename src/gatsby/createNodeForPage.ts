@@ -6,6 +6,7 @@ import loadPage from '../notion/loadPage';
 
 export default async function createNodeForPage(
   pageId: string,
+  rootPageId: string,
   title: string,
   index: number,
   notionLoader: NotionLoader,
@@ -17,7 +18,13 @@ export default async function createNodeForPage(
 ): Promise<void> {
   try {
     // loading page
-    const item = await loadPage(pageId, index, notionLoader, reporter);
+    const item = await loadPage(
+      pageId,
+      rootPageId,
+      index,
+      notionLoader,
+      reporter,
+    );
     const nodeId = createNodeId(pageId);
     createNode({
       ...item,
