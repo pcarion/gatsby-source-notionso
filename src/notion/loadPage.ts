@@ -106,6 +106,7 @@ export default async function loadPage(
 
   let slug = `${indexPage}`;
   let createdAt = new Date().toISOString();
+  let isDraft = false;
 
   if (hasMeta) {
     if (meta['slug']) {
@@ -116,6 +117,14 @@ export default async function loadPage(
     if (meta['date']) {
       createdAt = meta['date'];
     }
+    if (meta['draft']) {
+      const value = meta['draft'].toLowerCase();
+      if (value === 'false' || value === '0') {
+        isDraft = false;
+      } else {
+        isDraft = true;
+      }
+    }
   }
 
   const item: NotionPageDescription = {
@@ -124,6 +133,7 @@ export default async function loadPage(
     indexPage,
     slug,
     createdAt,
+    isDraft,
     blocks: [],
     images: imageDescriptions,
     linkedPages,

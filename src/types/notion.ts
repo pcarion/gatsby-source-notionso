@@ -41,6 +41,7 @@ export interface NotionPageDescription {
   indexPage: number;
   slug: string;
   createdAt: string;
+  isDraft: boolean;
   blocks: NotionPageBlock[];
   images: NotionPageImage[];
   linkedPages: NotionPageLinkedPage[];

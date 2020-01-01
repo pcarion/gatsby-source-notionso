@@ -97,6 +97,7 @@ export const createSchemaCustomization: GatsbyNode['createSchemaCustomization'] 
       pageId: String!
       title: String!
       indexPage: Int!
+      isDraft: Boolean!
       slug: String!
       createdAt: Date!
       blocks: [NotionPage${pluginConfig.name}Block!]
