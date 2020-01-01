@@ -55,6 +55,20 @@ export default async function loadPage(
           content: blockData.text,
         });
         break;
+      case 'bulleted_list':
+        blocks.push({
+          type: 'bulleted_list',
+          content: blockData.text,
+        });
+        break;
+      case 'header1':
+      case 'header2':
+      case 'header3':
+        blocks.push({
+          type: blockData.kind,
+          content: blockData.text,
+        });
+        break;
       case 'page':
         linkedPages.push({
           pageId: blockData.pageId,

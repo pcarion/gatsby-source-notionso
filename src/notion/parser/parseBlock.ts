@@ -10,6 +10,7 @@ import {
   BlockData,
   BlockText,
   BlockDescription,
+  BlockBulletedList,
 } from '../../types/notion';
 import parseNotionText from './parseNotionText';
 import notionPageTextToString from './notionPageTextToString';
@@ -32,6 +33,17 @@ function getFieldAsString(
 // generic type for block content parser
 type BlockContentParser = (properties: Json, reporter: Reporter) => BlockData;
 
+function parseBulletedList(block: Json, _reporter: Reporter): BlockData {
+  const properties = block.properties as Json;
+
+  const title = (properties && properties.title) || [];
+  const result: BlockBulletedList = {
+    kind: 'bulleted_list',
+    text: parseNotionText(title as []),
+  };
+  return result;
+}
+
 function parseText(block: Json, _reporter: Reporter): BlockData {
   const properties = block.properties as Json;
 
@@ -41,6 +53,51 @@ function parseText(block: Json, _reporter: Reporter): BlockData {
     text: parseNotionText(title as []),
   };
   return result;
+}
+
+function parseHeader(
+  block: Json,
+  level: number,
+  _reporter: Reporter,
+): BlockData {
+  const properties = block.properties as Json;
+
+  const title = (properties && properties.title) || [];
+
+  switch (level) {
+    case 1:
+      return {
+        kind: 'header1',
+        text: parseNotionText(title as []),
+      };
+    case 2:
+      return {
+        kind: 'header2',
+        text: parseNotionText(title as []),
+      };
+    case 3:
+      return {
+        kind: 'header3',
+        text: parseNotionText(title as []),
+      };
+    default:
+      return {
+        kind: 'text',
+        text: parseNotionText(title as []),
+      };
+  }
+}
+
+function parseHeader1(block: Json, reporter: Reporter): BlockData {
+  return parseHeader(block, 1, reporter);
+}
+
+function parseHeader2(block: Json, reporter: Reporter): BlockData {
+  return parseHeader(block, 2, reporter);
+}
+
+function parseHeader3(block: Json, reporter: Reporter): BlockData {
+  return parseHeader(block, 3, reporter);
 }
 
 function parseCode(block: Json, _reporter: Reporter): BlockData {
@@ -119,10 +176,15 @@ const contentParserByTypes: Record<string, BlockContentParser | null> = {
   image: parseImage,
   page: parsePage,
   quote: parseQuote,
+  header: parseHeader1,
+  // eslint-disable-next-line @typescript-eslint/camelcase
+  sub_header: parseHeader2,
+  // eslint-disable-next-line @typescript-eslint/camelcase
+  sub_sub_header: parseHeader3,
+  // eslint-disable-next-line @typescript-eslint/camelcase
+  bulleted_list: parseBulletedList,
   // eslint-disable-next-line @typescript-eslint/camelcase
   column_list: ignoreBlockParser('column_list'),
-  // eslint-disable-next-line @typescript-eslint/camelcase
-  bulleted_list: ignoreBlockParser('bulleted_list'),
 };
 
 export default function parseBlock(

@@ -9,6 +9,16 @@ export interface BlockText {
   text: NotionPageText[];
 }
 
+export interface BlockHeader {
+  kind: 'header1' | 'header2' | 'header3';
+  text: NotionPageText[];
+}
+
+export interface BlockBulletedList {
+  kind: 'bulleted_list';
+  text: NotionPageText[];
+}
+
 export interface BlockPage {
   kind: 'page';
   pageId: string;
@@ -50,6 +60,8 @@ export type BlockData =
   | BlockCode
   | BlockImage
   | BlockQuote
+  | BlockBulletedList
+  | BlockHeader
   | BlockIgnore
   | BlockUnknown;
 
@@ -72,7 +84,15 @@ export interface NotionPageText {
 }
 
 export interface NotionPageBlock {
-  type: 'text' | 'code' | 'image' | 'quote';
+  type:
+    | 'text'
+    | 'code'
+    | 'image'
+    | 'quote'
+    | 'bulleted_list'
+    | 'header1'
+    | 'header2'
+    | 'header3';
   content: NotionPageText[];
 }
 
