@@ -7,7 +7,6 @@
   "author": "Pierre Carion <pcarion@gmail.com>",
   "license": "BSD-3-Clause",
   "scripts": {
-    "test": "jest",
     "build": "tsc",
     "format": "prettier --write src/**/*.{ts,tsx}",
     "watch": "tsc --watch",
