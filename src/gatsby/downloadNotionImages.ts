@@ -1,4 +1,3 @@
-import * as util from 'util';
 import { Reporter, Actions, NodePluginArgs } from 'gatsby';
 
 import { createRemoteFileNode } from 'gatsby-source-filesystem';
@@ -33,12 +32,10 @@ export default async function downloadNotionImages(
   await Promise.all(
     imagesNodes.map(async node => {
       ((node.images as NotionPageImage[]) || []).forEach(image => {
-        console.log(image.notionUrl);
         imagesToDownload.push([image.notionUrl, image.contentId, image.pageId]);
       });
     }),
   );
-  console.log('@@@ images to download:', imagesToDownload);
   const result = await notionLoader.downloadImages(imagesToDownload);
   reporter.info(`Images for notion source: ${result}`);
 
@@ -52,14 +49,6 @@ export default async function downloadNotionImages(
       createNodeId,
       reporter,
     });
-    console.log('@@@ notionUrl:', notionUrl);
-    console.log(
-      '@@@@ fileNode:',
-      util.inspect(fileNode, {
-        colors: true,
-        depth: null,
-      }),
-    );
     const assetNodeId = createNodeId(notionUrl);
     const item = {
       notionUrl,
@@ -79,5 +68,4 @@ export default async function downloadNotionImages(
       },
     });
   }
-  console.log('@@@ done with downloadNotionImages');
 }

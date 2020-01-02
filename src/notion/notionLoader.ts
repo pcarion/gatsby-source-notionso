@@ -42,9 +42,11 @@ export default function notionLoader(
         data: JSON.stringify(data, null, 0),
         url: urlLoadPageChunk,
       };
-      reporter.info(
-        `retrieving notion data: ${JSON.stringify(options, null, '')}`,
-      );
+      if (debug) {
+        reporter.info(
+          `retrieving notion data: ${JSON.stringify(options, null, '')}`,
+        );
+      }
       return axios(options)
         .then(function(response) {
           if (response.status !== 200) {
@@ -122,12 +124,14 @@ export default function notionLoader(
               `Error retrieving images ${images} , status is: ${response.status}`,
             );
           } else {
-            console.log(
-              util.inspect(response.data, {
-                colors: true,
-                depth: null,
-              }),
-            );
+            if (debug) {
+              console.log(
+                util.inspect(response.data, {
+                  colors: true,
+                  depth: null,
+                }),
+              );
+            }
             (
               (response &&
                 response.data &&
@@ -143,10 +147,6 @@ export default function notionLoader(
           console.log('Error:');
           console.log(error);
           return result;
-        })
-        .finally(function() {
-          console.log('DONE');
-          console.log(options);
         });
     },
     getBlockById(blockId: string): NotionPageBlock | undefined {
