@@ -1,10 +1,6 @@
-src
-test
-.eslintrc
-.gitignore
-.editorconfig
-.prettierrc
-jest-config.js
-package-lock.json
-yarn.lock
-tsconfig.json
+node_modules
+yarn-error.log
+tmp
+.npmrc
+npm-debug.log
+
