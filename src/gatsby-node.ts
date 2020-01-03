@@ -6,6 +6,7 @@ import {
 import { NotionsoPluginOptions } from './types/notion';
 
 import createNodesFromRootPage from './gatsby/createNodesFromRootPage';
+import extractPageIdFromPublicUrl from './util/extractPageIdFromPublicUrl';
 
 const defaultConfig = {
   debug: false,
@@ -17,7 +18,7 @@ export const sourceNodes: GatsbyNode['sourceNodes'] = async (
   pluginConfig: NotionsoPluginOptions,
 ): Promise<void> => {
   const config = { ...defaultConfig, ...pluginConfig };
-  const { rootPageId, name } = config;
+  const { rootPageUrl, name } = config;
   const {
     actions,
     getNodes,
@@ -28,15 +29,23 @@ export const sourceNodes: GatsbyNode['sourceNodes'] = async (
     reporter,
   } = context;
   const { createNode } = actions;
-  if (!rootPageId) {
+  if (!rootPageUrl) {
     reporter.panic(
-      'gatsby-source-notionso requires a rootPageId parameter. This is the id of the root page for your notion content',
+      'gatsby-source-notionso requires a rootPageUrl parameter. This is the id of the root page for your notion content',
     );
     return;
   }
 
-  if (!name) {
-    reporter.panic('gatsby-source-notionso requires a name parameter.');
+  const rootPageId = extractPageIdFromPublicUrl(rootPageUrl);
+  if (!rootPageUrl) {
+    reporter.panic(
+      'gatsby-source-notionso requires a rootPageUrl parameter. This is the id of the root page for your notion content',
+    );
+    return;
+  }
+
+  if (!rootPageId) {
+    reporter.panic('gatsby-source-notionso requires a valid public URL.');
     return;
   }
   await createNodesFromRootPage(

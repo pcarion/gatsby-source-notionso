@@ -5,6 +5,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 
+## [0.0.3] - 2020-01-02
+- replace parameter `rootPageId` by `rootPageUrl` as it is easier for the user to find
+- add unit test for extraction of pageId from URL
+
 ## [0.0.2] - 2020-01-01
 ### Added
 - House cleaning: `.npmignore` file added to avoid junk in npmjs

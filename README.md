@@ -18,7 +18,7 @@ $ yarn add gatsby-source-notionso
 ## Options
 ```ts
 export interface NotionsoPluginOptions extends PluginOptions {
-  rootPageId: string; // the id of the root page
+  rootPageUrl: string; // the notion page URL of the root page
   name: string; // name of your data set to identify the data for the instance of this plugin
   tokenv2?: string; // not used yet (the page needs to be public)
   debug?: boolean; // set to true to enable debugging information
