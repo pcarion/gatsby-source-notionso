@@ -18,7 +18,7 @@ export const sourceNodes: GatsbyNode['sourceNodes'] = async (
   pluginConfig: NotionsoPluginOptions,
 ): Promise<void> => {
   const config = { ...defaultConfig, ...pluginConfig };
-  const { rootPageUrl, name } = config;
+  const { rootPageUrl } = config;
   const {
     actions,
     getNodes,
