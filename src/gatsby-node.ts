@@ -18,7 +18,7 @@ export const sourceNodes: GatsbyNode['sourceNodes'] = async (
   pluginConfig: NotionsoPluginOptions,
 ): Promise<void> => {
   const config = { ...defaultConfig, ...pluginConfig };
-  const { rootPageUrl } = config;
+  const { rootPageUrl, name } = config;
   const {
     actions,
     getNodes,
@@ -36,18 +36,19 @@ export const sourceNodes: GatsbyNode['sourceNodes'] = async (
     return;
   }
 
-  const rootPageId = extractPageIdFromPublicUrl(rootPageUrl);
-  if (!rootPageUrl) {
+  if (!name) {
     reporter.panic(
-      'gatsby-source-notionso requires a rootPageUrl parameter. This is the id of the root page for your notion content',
+      'gatsby-source-notionso requires a name parameter. This is used to build the names of the GraphQL types',
     );
     return;
   }
 
+  const rootPageId = extractPageIdFromPublicUrl(rootPageUrl);
   if (!rootPageId) {
     reporter.panic('gatsby-source-notionso requires a valid public URL.');
     return;
   }
+
   await createNodesFromRootPage(
     rootPageId,
     createNodeId,
