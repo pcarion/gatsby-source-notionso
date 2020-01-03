@@ -56,7 +56,7 @@ export type JsonArray = Array<JsonTypes>;
 
 // plugin configuration data
 export interface NotionsoPluginOptions extends PluginOptions {
-  rootPageId: string;
+  rootPageUrl: string;
   name: string;
   tokenv2?: string;
   downloadLocal: boolean;
