@@ -23,6 +23,18 @@ function getPropertyAsString(
   return notionPageTextToString(property.value);
 }
 
+function getAttributeAsString(
+  block: NotionPageBlock,
+  attName: string,
+  defaultValue: '',
+): string {
+  const att = block.attributes.find(p => p.att === attName);
+  if (!att || !att.value) {
+    return defaultValue;
+  }
+  return att.value;
+}
+
 function getPropertyText(
   block: NotionPageBlock,
   propName: string,
@@ -147,6 +159,7 @@ export default async function loadPage(
     createdAt,
     isDraft,
     excerpt,
+    pageIcon: getAttributeAsString(page, 'pageIcon', ''),
     blocks: [],
     images: imageDescriptions,
     linkedPages,
