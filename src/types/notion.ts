@@ -40,6 +40,7 @@ export interface NotionPageDescription {
   title: string;
   indexPage: number;
   slug: string;
+  excerpt: string;
   createdAt: string;
   isDraft: boolean;
   blocks: NotionPageBlock[];

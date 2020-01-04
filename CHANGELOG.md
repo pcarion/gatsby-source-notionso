@@ -4,6 +4,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
+- add `excerpt` property. This is the firt non blank text block of the page
 
 ## [0.0.3] - 2020-01-02
 - replace parameter `rootPageId` by `rootPageUrl` as it is easier for the user to find
