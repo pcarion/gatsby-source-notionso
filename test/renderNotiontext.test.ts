@@ -208,7 +208,7 @@ const fixtures: Fixtures = [
   {
     in: [
       {
-        text: 'This a ',
+        text: 'This is a ',
         atts: [],
       },
       {
@@ -286,7 +286,49 @@ const fixtures: Fixtures = [
         atts: [],
       },
     ],
-    out: 'not yet',
+    out:
+      "let's consider <a href=https://www.google.com>a link with </a><a href=https://www.bing.com>a link</a><a href=https://www.google.com> in the anchor</a>, will you?",
+  },
+  {
+    in: [
+      {
+        text: 'This is a ',
+        atts: [
+          {
+            att: 'a',
+            value: 'https://dev.null',
+          },
+        ],
+      },
+      {
+        text: 'very ',
+        atts: [
+          {
+            att: 'a',
+            value: 'https://dev.null',
+          },
+        ],
+      },
+      {
+        text: 'nice',
+        atts: [
+          {
+            att: 'a',
+            value: 'https://dev.null',
+          },
+        ],
+      },
+      {
+        text: ' link',
+        atts: [
+          {
+            att: 'a',
+            value: 'https://dev.null',
+          },
+        ],
+      },
+    ],
+    out: '<a href=https://dev.null>This is a very nice link</a>',
   },
 ];
 
@@ -337,8 +379,13 @@ describe('renderNotionText', () => {
     const result = renderNotionText(
       [
         {
-          text: 'This a ',
-          atts: [],
+          text: 'This is a ',
+          atts: [
+            {
+              att: 'a',
+              value: 'https://dev.null',
+            },
+          ],
         },
         {
           text: 'very ',
@@ -352,9 +399,6 @@ describe('renderNotionText', () => {
         {
           text: 'nice',
           atts: [
-            {
-              att: 'b',
-            },
             {
               att: 'a',
               value: 'https://dev.null',
@@ -370,23 +414,17 @@ describe('renderNotionText', () => {
             },
           ],
         },
-        {
-          text: '.',
-          atts: [],
-        },
       ],
       factory.renderFuncs(),
     );
     expect(factory.toString(result)).toEqual(
-      'This is a <a href=https://dev.null>very <b>nice</b> link</a>.',
+      '<a href=https://dev.null>This is a very nice link</a>',
     );
   });
 
-  it.skip('should render fixtures', () => {
-    fixtures.forEach(fixture => {
-      const factory = renderFuncsForTests();
-      const result = renderNotionText(fixture.in, factory.renderFuncs());
-      expect(factory.toString(result)).toEqual(fixture.out);
-    });
+  it.each(fixtures)('text : %#', fixture => {
+    const factory = renderFuncsForTests();
+    const result = renderNotionText(fixture.in, factory.renderFuncs());
+    expect(factory.toString(result)).toEqual(fixture.out);
   });
 });

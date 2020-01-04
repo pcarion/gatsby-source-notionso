@@ -46,6 +46,7 @@ function splitPerLinks(items: NotionPageText[]): LinkTextSplit[] {
           ref,
           items: [],
         };
+        result.push(currentSplit);
       }
       currentSplit.items.push(itemNoLink);
     }
@@ -56,11 +57,15 @@ function splitPerLinks(items: NotionPageText[]): LinkTextSplit[] {
 export default function renderNotionText(
   input: NotionPageText[],
   renderFuncs: NotionRenderFuncs,
+  debug = false,
 ): NotionRenderChild[] {
   const result: NotionRenderChild[] = [];
   // we can split the input based on the links
   // it contains
   const splits = splitPerLinks(input);
+  if (debug) {
+    console.log('splits:', JSON.stringify(splits, null, '  '));
+  }
   splits.forEach(({ ref, items }) => {
     const children: NotionRenderChild[] = [];
     items.forEach(item => {
@@ -68,7 +73,9 @@ export default function renderNotionText(
         children.push(renderFuncs.wrapText(item.text));
       } else {
         item.atts.forEach(a => {
-          renderFuncs.renderTextAtt([renderFuncs.wrapText(item.text)], a.att);
+          children.push(
+            renderFuncs.renderTextAtt([renderFuncs.wrapText(item.text)], a.att),
+          );
         });
       }
     });
