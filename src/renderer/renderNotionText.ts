@@ -1,54 +1,82 @@
+import * as _ from 'lodash';
 import { NotionPageText } from '../types/notion';
 
-/*
-     "value": [
-      {
-       "text": "Let's ",
-       "atts": []
-      },
-      {
-       "text": "try",
-       "atts": [
-        {
-         "att": "i",
-         "value": null
-        }
-       ]
-      },
-      {
-       "text": " from here!",
-       "atts": []
-      }
-     ]
-*/
+export type NotionRenderChild = object;
 
 export interface NotionRenderFuncs {
-  renderText: (text: string) => void;
-  renderTextAtt: (text: string, att: string) => void;
-  renderLink: (text: string, ref: string) => void;
+  wrapText: (text: string) => NotionRenderChild;
+  renderTextAtt: (
+    children: NotionRenderChild[],
+    att: string,
+  ) => NotionRenderChild;
+  renderLink: (children: NotionRenderChild[], ref: string) => NotionRenderChild;
+}
+
+type LinkTextSplit = { ref: string; items: NotionPageText[] };
+
+function extractLink(item: NotionPageText): [NotionPageText, string] {
+  // we copy the attributes because _.remove mutates the array
+  const atts = item.atts ? [...item.atts] : [];
+  const refAtts = _.remove(atts, a => a.att === 'a');
+  const ref = refAtts.length > 0 ? refAtts[0].value || '' : '';
+  return [{ text: item.text, atts }, ref];
+}
+
+// we split the blocks of text based on the link
+// they are pointing to. The goal is to avoid the multiplcation
+// of links in the resulting html if we use formating for the anchor
+function splitPerLinks(items: NotionPageText[]): LinkTextSplit[] {
+  const result: LinkTextSplit[] = [
+    {
+      ref: '',
+      items: [],
+    },
+  ];
+  let currentSplit = result[0];
+  items.forEach(item => {
+    const [itemNoLink, ref] = extractLink(item);
+    if (ref === currentSplit.ref) {
+      currentSplit.items.push(itemNoLink);
+    } else {
+      if (currentSplit.items.length === 0) {
+        // the first slot was not actually used, so we overwrite it
+        currentSplit.ref = ref;
+      } else {
+        currentSplit = {
+          ref,
+          items: [],
+        };
+      }
+      currentSplit.items.push(itemNoLink);
+    }
+  });
+  return result;
 }
 
 export default function renderNotionText(
-  items: NotionPageText[],
+  input: NotionPageText[],
   renderFuncs: NotionRenderFuncs,
-): void {
-  items.forEach(item => {
-    if (!item.atts || item.atts.length === 0) {
-      renderFuncs.renderText(item.text);
+): NotionRenderChild[] {
+  const result: NotionRenderChild[] = [];
+  // we can split the input based on the links
+  // it contains
+  const splits = splitPerLinks(input);
+  splits.forEach(({ ref, items }) => {
+    const children: NotionRenderChild[] = [];
+    items.forEach(item => {
+      if (!item.atts || item.atts.length === 0) {
+        children.push(renderFuncs.wrapText(item.text));
+      } else {
+        item.atts.forEach(a => {
+          renderFuncs.renderTextAtt([renderFuncs.wrapText(item.text)], a.att);
+        });
+      }
+    });
+    if (ref === '') {
+      children.forEach(c => result.push(c));
     } else {
-      item.atts.forEach(a => {
-        if (a.att === 'a') {
-          // we have a link here
-          const ref = a.value;
-          if (ref) {
-            renderFuncs.renderLink(item.text, ref);
-          } else {
-            renderFuncs.renderTextAtt(item.text, a.att);
-          }
-        } else {
-          renderFuncs.renderTextAtt(item.text, a.att);
-        }
-      });
+      result.push(renderFuncs.renderLink(children, ref));
     }
   });
+  return result;
 }
