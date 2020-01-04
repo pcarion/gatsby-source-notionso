@@ -109,6 +109,7 @@ export const createSchemaCustomization: GatsbyNode['createSchemaCustomization'] 
       indexPage: Int!
       isDraft: Boolean!
       slug: String!
+      excerpt: String!
       createdAt: Date!
       blocks: [NotionPage${pluginConfig.name}Block!]
       images: [NotionPage${pluginConfig.name}Image!]

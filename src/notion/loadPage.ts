@@ -59,6 +59,8 @@ export default async function loadPage(
   const linkedPages: NotionPageLinkedPage[] = [];
   let hasMeta = false;
   const meta: Record<string, string> = {};
+  let hasExcerpt = false;
+  let excerpt = '';
 
   for (const blockId of page.blockIds) {
     const block = notionLoader.getBlockById(blockId);
@@ -73,6 +75,16 @@ export default async function loadPage(
           title: getPropertyAsString(block, 'title', ''),
         });
         break;
+      case 'text':
+        // the first non empty text becomes the excerpt
+        if (!hasExcerpt) {
+          const text = getPropertyAsString(block, 'title', '').trim();
+          if (text.length > 0) {
+            hasExcerpt = true;
+            excerpt = text;
+          }
+        }
+        break;
       case 'quote':
         if (!hasMeta) {
           hasMeta = true;
@@ -81,7 +93,7 @@ export default async function loadPage(
           if (text) {
             if (parseMetaBlock(text, meta)) {
               // if we were able to parse the block, we change its type
-              // (so that it is not rendered)
+              // (so that it is not rendered as a quote)
               block.type = '_meta';
             }
           }
@@ -134,6 +146,7 @@ export default async function loadPage(
     slug,
     createdAt,
     isDraft,
+    excerpt,
     blocks: [],
     images: imageDescriptions,
     linkedPages,

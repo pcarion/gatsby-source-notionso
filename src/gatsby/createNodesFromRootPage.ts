@@ -21,7 +21,7 @@ export default async function createNodesFromRootPage(
     const { debug } = pluginConfig;
 
     const loader = notionLoader(reporter, debug);
-    // loading page
+    // loading the root page
     const item = await loadPage(rootPageId, '', 0, loader, reporter);
 
     // we are interested only by the linked pages from the root page
@@ -31,7 +31,7 @@ export default async function createNodesFromRootPage(
       const { pageId, title } = linkedPage;
 
       // we reset data before we load a new page
-      // (to avoid keeping around to many blocks)
+      // (to avoid keeping around too many blocks)
       loader.reset();
 
       await createNodeForPage(
