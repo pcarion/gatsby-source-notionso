@@ -62,6 +62,7 @@ export default function renderNotionText(
       if (!item.atts || item.atts.length === 0) {
         children.push(renderFuncs.wrapText(item.text));
       } else {
+        // TODO: bug here - won't work with text with mutiple rendering attributes
         item.atts.forEach(a => {
           children.push(
             renderFuncs.renderTextAtt([renderFuncs.wrapText(item.text)], a.att),

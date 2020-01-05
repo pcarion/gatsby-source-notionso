@@ -1,4 +1,8 @@
-import { NotionRenderFuncs, NotionRenderChild } from '../src/renderer';
+import {
+  NotionRenderFuncs,
+  NotionRenderChild,
+  BlockMeta,
+} from '../src/renderer';
 
 export type FuncTestFactory = () => {
   renderFuncs: () => NotionRenderFuncs;
@@ -35,6 +39,7 @@ const renderFuncsForTests: FuncTestFactory = () => {
         },
         renderBlock: (
           type: string,
+          meta: BlockMeta,
           children: NotionRenderChild[][],
         ): NotionRenderChild => {
           const parts: string[] = [];

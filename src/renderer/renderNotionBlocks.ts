@@ -1,223 +1,29 @@
 import { NotionPageBlock, NotionPageText } from '../types/notion';
 
-import { NotionRenderFuncs, NotionRenderChild } from './index';
+import { NotionRenderFuncs, NotionRenderChild, BlockMeta } from './index';
 
 import renderNotionText from './renderNotionText';
-/*
-[
- {
-  "blockId": "718ddd99-2bec-4d47-917c-bb075a216340",
-  "blockIds": [
-   "746c125f-7f07-4950-980a-eeba2af3c626",
-   "fa20c5d7-bd87-486d-a614-b7092fe0519e",
-   "9349a8a9-1b95-4b34-801b-d8133894c745",
-   "6edb653f-6aa2-46a3-87a7-db255e469eef",
-   "3801f4ea-93be-4450-8d60-5a3636c4f7d1",
-   "217033e6-876a-4a75-a82f-db85ac39523a",
-   "646eefc4-b7b0-431e-a49d-bbc7632a5f68"
-  ],
-  "type": "page",
-  "attributes": [
-   {
-    "att": "pageIcon",
-    "value": "✒️"
-   }
-  ],
-  "properties": [
-   {
-    "propName": "title",
-    "value": [
-     {
-      "text": "test page",
-      "atts": []
-     }
-    ]
-   }
-  ]
- },
- {
-  "blockId": "746c125f-7f07-4950-980a-eeba2af3c626",
-  "blockIds": [],
-  "type": "text",
-  "attributes": [],
-  "properties": [
-   {
-    "propName": "title",
-    "value": [
-     {
-      "text": "Let's ",
-      "atts": []
-     },
-     {
-      "text": "try",
-      "atts": [
-       {
-        "att": "i",
-        "value": null
-       }
-      ]
-     },
-     {
-      "text": " from here!",
-      "atts": []
-     }
-    ]
-   }
-  ]
- },
- {
-  "blockId": "fa20c5d7-bd87-486d-a614-b7092fe0519e",
-  "blockIds": [],
-  "type": "image",
-  "attributes": [
-   {
-    "att": "width",
-    "value": "2447"
-   },
-   {
-    "att": "aspectRatio",
-    "value": "0.6943195749897834"
-   }
-  ],
-  "properties": [
-   {
-    "propName": "source",
-    "value": [
-     {
-      "text": "https://s3-us-west-2.amazonaws.com/secure.notion-static.com/443cca18-4fd5-402e-aa6f-94815965a547/alphabet.png",
-      "atts": []
-     }
-    ]
-   }
-  ]
- },
- {
-  "blockId": "9349a8a9-1b95-4b34-801b-d8133894c745",
-  "blockIds": [],
-  "type": "text",
-  "attributes": [],
-  "properties": [
-   {
-    "propName": "title",
-    "value": [
-     {
-      "text": "item 1",
-      "atts": []
-     }
-    ]
-   }
-  ]
- },
- {
-  "blockId": "6edb653f-6aa2-46a3-87a7-db255e469eef",
-  "blockIds": [],
-  "type": "bulleted_list",
-  "attributes": [],
-  "properties": [
-   {
-    "propName": "title",
-    "value": [
-     {
-      "text": "list 1",
-      "atts": []
-     }
-    ]
-   }
-  ]
- },
- {
-  "blockId": "3801f4ea-93be-4450-8d60-5a3636c4f7d1",
-  "blockIds": [
-   "40bf8eed-9cd1-4b07-b554-fff95ac7c61c",
-   "4d095669-d559-4172-b991-9f390a14fe84"
-  ],
-  "type": "bulleted_list",
-  "attributes": [],
-  "properties": [
-   {
-    "propName": "title",
-    "value": [
-     {
-      "text": "list 2",
-      "atts": []
-     }
-    ]
-   }
-  ]
- },
- {
-  "blockId": "40bf8eed-9cd1-4b07-b554-fff95ac7c61c",
-  "blockIds": [],
-  "type": "bulleted_list",
-  "attributes": [],
-  "properties": [
-   {
-    "propName": "title",
-    "value": [
-     {
-      "text": "list 2.1",
-      "atts": []
-     }
-    ]
-   }
-  ]
- },
- {
-  "blockId": "4d095669-d559-4172-b991-9f390a14fe84",
-  "blockIds": [],
-  "type": "bulleted_list",
-  "attributes": [],
-  "properties": [
-   {
-    "propName": "title",
-    "value": [
-     {
-      "text": "list 2.2",
-      "atts": []
-     }
-    ]
-   }
-  ]
- },
- {
-  "blockId": "217033e6-876a-4a75-a82f-db85ac39523a",
-  "blockIds": [],
-  "type": "bulleted_list",
-  "attributes": [],
-  "properties": [
-   {
-    "propName": "title",
-    "value": [
-     {
-      "text": "list 3",
-      "atts": []
-     }
-    ]
-   }
-  ]
- },
- {
-  "blockId": "646eefc4-b7b0-431e-a49d-bbc7632a5f68",
-  "blockIds": [],
-  "type": "text",
-  "attributes": [],
-  "properties": [
-   {
-    "propName": "title",
-    "value": [
-     {
-      "text": "para",
-      "atts": []
-     }
-    ]
-   }
-  ]
- }
-]
-*/
+
+import notionPageTextToString from '../notion/parser/notionPageTextToString';
 
 interface Block extends NotionPageBlock {
   _subBlocks: Block[];
+}
+
+function getPropertiesAsDict(block: Block): Record<string, string> {
+  const result: Record<string, string> = {};
+  block.properties.forEach(p => {
+    result[p.propName] = notionPageTextToString(p.value);
+  });
+  return result;
+}
+
+function getAttributesAsDict(block: Block): Record<string, string> {
+  const result: Record<string, string> = {};
+  block.attributes.forEach(a => {
+    result[a.att] = a.value || '';
+  });
+  return result;
 }
 
 function findTextProperty(block: Block, propName: string): NotionPageText[] {
@@ -230,6 +36,11 @@ function findTextProperty(block: Block, propName: string): NotionPageText[] {
   return prop.value;
 }
 
+function hasProperty(block: Block, propName: string): boolean {
+  const prop = block.properties.find(p => p.propName === propName);
+  return !!prop;
+}
+
 function findBlockById(
   id: string,
   blocks: NotionPageBlock[],
@@ -238,6 +49,72 @@ function findBlockById(
   return block;
 }
 
+function isListItemsBlockType(type: string): boolean {
+  return ['bulleted_list', 'numbered_list'].indexOf(type) >= 0;
+}
+function mkEmptyBlock(type: string): Block {
+  return {
+    type,
+    blockId: '',
+    attributes: [],
+    properties: [],
+    _subBlocks: [],
+    blockIds: [],
+  };
+}
+// iterate through the list and merge together
+// blocks belonging to the same list
+function mergeListBlocks(blocks: Block[]): Block[] {
+  const result: Block[] = [];
+  let mergingBlock: Block = mkEmptyBlock('');
+  blocks.forEach(block => {
+    const type = block.type;
+    if (type === mergingBlock.type) {
+      // we are in a list of items to be merged
+      // we change the type of the subnode to 'item'
+      block.type = `${type}__item`;
+      mergingBlock._subBlocks.push(block);
+      mergingBlock.blockIds.push(block.blockId);
+    } else {
+      // we are leaving the sequence of nodes to merge
+      // we push that block if it had subblocks
+      if (mergingBlock._subBlocks.length > 0) {
+        result.push(mergingBlock);
+      }
+      if (isListItemsBlockType(type)) {
+        // we change the type of the subnode to 'item'
+        block.type = `${type}__item`;
+        mergingBlock = mkEmptyBlock(type);
+        mergingBlock.blockId = block.blockId;
+        mergingBlock._subBlocks = [block];
+        mergingBlock.blockIds = [block.blockId];
+        mergingBlock.attributes = [];
+        mergingBlock.properties = [];
+      } else {
+        mergingBlock = mkEmptyBlock('');
+        // non list item block, we push it as is
+        result.push(block);
+      }
+    }
+  });
+  // flush last block if needed
+  if (mergingBlock._subBlocks.length > 0) {
+    result.push(mergingBlock);
+  }
+  return result;
+}
+
+// for bulleted list, numbered list etc all the items
+// are adjacents
+// this function will create a parent node with _suBlocks containing
+// the items of the list
+function aggregateListTree(block: Block): Block {
+  block._subBlocks = mergeListBlocks(block._subBlocks);
+  block._subBlocks.forEach(b => aggregateListTree(b));
+  return block;
+}
+
+// we store in _subBlocks all the blocks which were referenced in blockIds
 function buildTree(block: NotionPageBlock, blocks: NotionPageBlock[]): Block {
   const root: Block = {
     ...block,
@@ -250,7 +127,8 @@ function buildTree(block: NotionPageBlock, blocks: NotionPageBlock[]): Block {
     }
     root._subBlocks.push(buildTree(subBlock, blocks));
   });
-  return root;
+  // we aggregate list items
+  return aggregateListTree(root);
 }
 
 function renderBlocks(
@@ -258,35 +136,30 @@ function renderBlocks(
   renderFuncs: NotionRenderFuncs,
   debug: boolean,
 ): NotionRenderChild[] {
-  let blockType = '';
   const result: NotionRenderChild[] = [];
-  const children: NotionRenderChild[][] = [];
   blocks.forEach(block => {
-    if (block.type !== blockType) {
-      if (blockType !== '') {
-        const child = renderFuncs.renderBlock(blockType, children);
-        result.push(child);
-      }
-      blockType = block.type;
-      children.length = 0;
+    // get meta information about block
+    const blockChildren: NotionRenderChild[] = [];
+    const meta: BlockMeta = {
+      properties: getPropertiesAsDict(block),
+      attributes: getAttributesAsDict(block),
+    };
+    let texts: NotionPageText[] = [];
+    if (hasProperty(block, 'title')) {
+      texts = findTextProperty(block, 'title');
+    } else {
+      // if no title property, we put an empty text
+      texts = [
+        {
+          text: '',
+          atts: [],
+        },
+      ];
     }
-    const texts: NotionPageText[] = findTextProperty(block, 'title');
-    const blockChildren: NotionRenderChild[] = renderNotionText(
-      texts,
-      renderFuncs,
-      debug,
-    );
-    if (block._subBlocks.length > 0) {
-      const subs = renderBlocks(block._subBlocks, renderFuncs, debug);
-      subs.forEach(s => blockChildren.push(s));
-    }
-    children.push(blockChildren);
-  });
-  // flush last block
-  if (blockType !== '') {
-    const child = renderFuncs.renderBlock(blockType, children);
+    blockChildren.push(renderNotionText(texts, renderFuncs, debug));
+    const child = renderFuncs.renderBlock(block.type, meta, blockChildren);
     result.push(child);
-  }
+  });
   return result;
 }
 
