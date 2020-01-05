@@ -373,7 +373,7 @@ describe('renderNotionText', () => {
       ],
       factory.renderFuncs(),
     );
-    expect(factory.toString(result)).toEqual(
+    expect(factory.childrenToString(result)).toEqual(
       '<a href=https://dev.null>This is a very nice link</a>',
     );
   });
@@ -381,6 +381,6 @@ describe('renderNotionText', () => {
   it.each(fixtures)('text : %#', fixture => {
     const factory = renderFuncsForTests();
     const result = renderNotionText(fixture.in, factory.renderFuncs());
-    expect(factory.toString(result)).toEqual(fixture.out);
+    expect(factory.childrenToString(result)).toEqual(fixture.out);
   });
 });

@@ -131,35 +131,26 @@ function buildTree(block: NotionPageBlock, blocks: NotionPageBlock[]): Block {
   return aggregateListTree(root);
 }
 
-function renderBlocks(
-  blocks: Block[],
+function renderBlock(
+  root: Block,
   renderFuncs: NotionRenderFuncs,
   debug: boolean,
-): NotionRenderChild[] {
-  const result: NotionRenderChild[] = [];
-  blocks.forEach(block => {
-    // get meta information about block
-    const blockChildren: NotionRenderChild[] = [];
-    const meta: BlockMeta = {
-      properties: getPropertiesAsDict(block),
-      attributes: getAttributesAsDict(block),
-    };
-    let texts: NotionPageText[] = [];
-    if (hasProperty(block, 'title')) {
-      texts = findTextProperty(block, 'title');
-    } else {
-      // if no title property, we put an empty text
-      texts = [
-        {
-          text: '',
-          atts: [],
-        },
-      ];
-    }
-    blockChildren.push(renderNotionText(texts, renderFuncs, debug));
-    const child = renderFuncs.renderBlock(block.type, meta, blockChildren);
-    result.push(child);
+): NotionRenderChild {
+  const children: NotionRenderChild[] = [];
+  // get meta information about block
+  const meta: BlockMeta = {
+    properties: getPropertiesAsDict(root),
+    attributes: getAttributesAsDict(root),
+  };
+  if (hasProperty(root, 'title') && root.type !== 'page') {
+    const texts = findTextProperty(root, 'title');
+    const textBlocks = renderNotionText(texts, renderFuncs, debug);
+    textBlocks.forEach(b => children.push(b));
+  }
+  root._subBlocks.forEach(block => {
+    children.push(renderBlock(block, renderFuncs, debug));
   });
+  const result = renderFuncs.renderBlock(root.type, meta, children);
   return result;
 }
 
@@ -168,12 +159,12 @@ export default function renderPageblocks(
   blocks: NotionPageBlock[],
   renderFuncs: NotionRenderFuncs,
   debug = false,
-): NotionRenderChild[] {
+): NotionRenderChild {
   const pageBlock = findBlockById(pageId, blocks);
   if (!pageBlock) {
     throw new Error(`missing root block id: ${pageId}`);
   }
   // we build the tree of blocks
   const rootBlock = buildTree(pageBlock, blocks);
-  return renderBlocks(rootBlock._subBlocks, renderFuncs, debug);
+  return renderBlock(rootBlock, renderFuncs, debug);
 }

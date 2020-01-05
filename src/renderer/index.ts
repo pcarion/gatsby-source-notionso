@@ -31,7 +31,7 @@ type NotionRendererParam = {
 };
 
 type NotionPageRenderer = {
-  render: (renderFuncs: NotionRenderFuncs) => object[];
+  render: (renderFuncs: NotionRenderFuncs) => object;
 };
 
 type NotionPageRendererFactory = (
@@ -43,7 +43,7 @@ const renderer: NotionPageRendererFactory = ({
   allNotionPageAsset,
 }) => {
   return {
-    render: (renderFuncs: NotionRenderFuncs): object[] => {
+    render: (renderFuncs: NotionRenderFuncs): object => {
       console.log('From: gatsy-source-notionso/renderer:');
       console.log('notionPage:', notionPage);
       console.log('allNotionPageAsset:', allNotionPageAsset);
