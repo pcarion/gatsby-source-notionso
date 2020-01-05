@@ -1,9 +1,6 @@
-import renderNotionText, {
-  NotionRenderFuncs,
-  NotionRenderChild,
-} from '../src/renderer/renderNotionText';
-
+import renderNotionText from '../src/renderer/renderNotionText';
 import { NotionPageText } from '../src/types/notion';
+import renderFuncsForTests from './renderFuncsForTests';
 
 type Fixtures = { in: NotionPageText[]; out: string }[];
 
@@ -331,47 +328,6 @@ const fixtures: Fixtures = [
     out: '<a href=https://dev.null>This is a very nice link</a>',
   },
 ];
-
-type FuncTestFactory = () => {
-  renderFuncs: () => NotionRenderFuncs;
-  toString(children: object[]): string;
-};
-
-interface FuncTestFactoryChild extends NotionRenderChild {
-  text: string;
-}
-
-const renderFuncsForTests: FuncTestFactory = () => {
-  function childrenToString(children: object[]): string {
-    const actualChildren = children as FuncTestFactoryChild[];
-    return actualChildren.map(c => c.text || ('' as string)).join('');
-  }
-  return {
-    renderFuncs(): NotionRenderFuncs {
-      return {
-        wrapText: (text): NotionRenderChild => {
-          return {
-            text,
-          };
-        },
-        renderTextAtt: (
-          children: NotionRenderChild[],
-          att,
-        ): NotionRenderChild => {
-          const text = `<${att}>${childrenToString(children)}</${att}>`;
-          return { text };
-        },
-        renderLink: (children: NotionRenderChild[], ref): NotionRenderChild => {
-          const text = `<a href=${ref}>${childrenToString(children)}</a>`;
-          return { text };
-        },
-      };
-    },
-    toString(children: object[]): string {
-      return childrenToString(children);
-    },
-  };
-};
 
 describe('renderNotionText', () => {
   it('should render', () => {

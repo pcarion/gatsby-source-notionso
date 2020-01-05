@@ -1,3 +1,21 @@
+export type NotionRenderChild = object;
+
+export interface NotionRenderFuncs {
+  // span rendering
+  wrapText: (text: string) => NotionRenderChild;
+  renderTextAtt: (
+    children: NotionRenderChild[],
+    att: string,
+  ) => NotionRenderChild;
+  renderLink: (children: NotionRenderChild[], ref: string) => NotionRenderChild;
+
+  // blocks rendering
+  renderBlock(
+    blockType: string,
+    children: NotionRenderChild[],
+  ): NotionRenderChild;
+}
+
 type NotionRendererParam = {
   notionPage: object;
   allNotionPageAsset: object;

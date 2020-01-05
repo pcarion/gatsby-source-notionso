@@ -1,16 +1,6 @@
 import * as _ from 'lodash';
 import { NotionPageText } from '../types/notion';
-
-export type NotionRenderChild = object;
-
-export interface NotionRenderFuncs {
-  wrapText: (text: string) => NotionRenderChild;
-  renderTextAtt: (
-    children: NotionRenderChild[],
-    att: string,
-  ) => NotionRenderChild;
-  renderLink: (children: NotionRenderChild[], ref: string) => NotionRenderChild;
-}
+import { NotionRenderChild, NotionRenderFuncs } from './index';
 
 type LinkTextSplit = { ref: string; items: NotionPageText[] };
 
