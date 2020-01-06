@@ -10,20 +10,17 @@ interface Block extends NotionPageBlock {
   _subBlocks: Block[];
 }
 
-function getPropertiesAsDict(block: Block): Record<string, string> {
-  const result: Record<string, string> = {};
+function addPropertiesToDict(block: Block, dict: Record<string, string>): void {
   block.properties.forEach(p => {
-    result[p.propName] = notionPageTextToString(p.value);
+    // TODO: check overwrite
+    dict[p.propName] = notionPageTextToString(p.value);
   });
-  return result;
 }
 
-function getAttributesAsDict(block: Block): Record<string, string> {
-  const result: Record<string, string> = {};
+function addAttributesToDict(block: Block, dict: Record<string, string>): void {
   block.attributes.forEach(a => {
-    result[a.att] = a.value || '';
+    dict[a.att] = a.value || '';
   });
-  return result;
 }
 
 function findTextProperty(block: Block, propName: string): NotionPageText[] {
@@ -115,7 +112,11 @@ function aggregateListTree(block: Block): Block {
 }
 
 // we store in _subBlocks all the blocks which were referenced in blockIds
-function buildTree(block: NotionPageBlock, blocks: NotionPageBlock[]): Block {
+function buildTree(
+  block: NotionPageBlock,
+  blocks: NotionPageBlock[],
+  debug: boolean,
+): Block {
   const root: Block = {
     ...block,
     _subBlocks: [],
@@ -125,10 +126,9 @@ function buildTree(block: NotionPageBlock, blocks: NotionPageBlock[]): Block {
     if (!subBlock) {
       throw new Error(`missing block id: ${id}`);
     }
-    root._subBlocks.push(buildTree(subBlock, blocks));
+    root._subBlocks.push(buildTree(subBlock, blocks, debug));
   });
-  // we aggregate list items
-  return aggregateListTree(root);
+  return root;
 }
 
 function renderBlock(
@@ -138,10 +138,9 @@ function renderBlock(
 ): NotionRenderChild {
   const children: NotionRenderChild[] = [];
   // get meta information about block
-  const meta: BlockMeta = {
-    properties: getPropertiesAsDict(root),
-    attributes: getAttributesAsDict(root),
-  };
+  const meta: BlockMeta = {};
+  addPropertiesToDict(root, meta);
+  addAttributesToDict(root, meta);
   if (hasProperty(root, 'title') && root.type !== 'page') {
     const texts = findTextProperty(root, 'title');
     const textBlocks = renderNotionText(texts, renderFuncs, debug);
@@ -165,6 +164,21 @@ export default function renderPageblocks(
     throw new Error(`missing root block id: ${pageId}`);
   }
   // we build the tree of blocks
-  const rootBlock = buildTree(pageBlock, blocks);
-  return renderBlock(rootBlock, renderFuncs, debug);
+  const rootBlock = buildTree(pageBlock, blocks, debug);
+  if (debug) {
+    console.log(
+      'buildTree>tree>rootBlock>',
+      JSON.stringify(rootBlock, null, '  '),
+    );
+  }
+
+  const aggregatedRootBlock = aggregateListTree(rootBlock);
+  if (debug) {
+    console.log(
+      'buildTree>aggregatedRootBlock>',
+      JSON.stringify(aggregatedRootBlock, null, '  '),
+    );
+  }
+
+  return renderBlock(aggregatedRootBlock, renderFuncs, debug);
 }

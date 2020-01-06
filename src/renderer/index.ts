@@ -1,10 +1,7 @@
 import renderNotionBlocks from './renderNotionBlocks';
 import { NotionPageDescription } from '../types/notion';
 
-export interface BlockMeta {
-  properties: Record<string, string>;
-  attributes: Record<string, string>;
-}
+export type BlockMeta = Record<string, string>;
 
 export type NotionRenderChild = object;
 
