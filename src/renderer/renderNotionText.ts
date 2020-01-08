@@ -44,6 +44,56 @@ function splitPerLinks(items: NotionPageText[]): LinkTextSplit[] {
   return result;
 }
 
+// starting from a given index, this function counts
+// the number of consecutive items having the same attribute set
+function lengthAttributeSequence(
+  items: NotionPageText[],
+  att: string,
+  index: number,
+): number {
+  let count = 0;
+  for (const ix = index; ix < items.length; ix++) {
+    if (items[ix].atts.find(a => a.att === att)) {
+      count++;
+    } else {
+      return count;
+    }
+  }
+  return count;
+}
+
+interface AccumulatedStyle {
+  content: NotionRenderChild;
+  attributes: Record<string, number>;
+}
+
+// we want this kind of transformations:
+// x:a y:b => a(x) b(y)
+// x:ab y:b => b(a(x) y)
+// x:a y:ab z:b => a(x b(y)) b(z) | a(x) b(a(y) z)
+// x:a y:ab z:a => a(x b(y) z)
+function renderTextItems(
+  items: NotionPageText[],
+  renderFuncs: NotionRenderFuncs,
+): NotionRenderChild[] {
+  const children: NotionRenderChild[] = [];
+  const accumulated: AccumulatedStyle[] = [];
+  // first pass: we wrap the text and preare the data structure
+  // to track the attributes sequences length
+  items.forEach((item, index) => {
+    const acc: AccumulatedStyle = {
+      content: renderFuncs.wrapText(item.text),
+      attributes: {},
+    };
+    item.atts.forEach(
+      a =>
+        (acc.attributes[a.att] = lengthAttributeSequence(items, a.att, index)),
+    );
+    accumulated.push(acc);
+  });
+  return children;
+}
+
 export default function renderNotionText(
   input: NotionPageText[],
   renderFuncs: NotionRenderFuncs,
@@ -71,8 +121,10 @@ export default function renderNotionText(
       }
     });
     if (ref === '') {
+      // no link, we push all the rendered piece
       children.forEach(c => result.push(c));
     } else {
+      // we ahe a link: we pushed the rendered link
       result.push(renderFuncs.renderLink(children, ref));
     }
   });

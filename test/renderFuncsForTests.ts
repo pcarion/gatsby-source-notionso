@@ -5,7 +5,7 @@ import {
 } from '../src/renderer';
 
 export type FuncTestFactory = (
-  debug: boolean,
+  debug?: boolean,
 ) => {
   renderFuncs: () => NotionRenderFuncs;
   childrenToString(children: object[]): string;
