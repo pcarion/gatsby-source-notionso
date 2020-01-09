@@ -50,9 +50,10 @@ function lengthAttributeSequence(
   items: NotionPageText[],
   att: string,
   index: number,
+  nbItems: number,
 ): number {
   let count = 0;
-  for (const ix = index; ix < items.length; ix++) {
+  for (let ix = index; ix < index + nbItems; ix++) {
     if (items[ix].atts.find(a => a.att === att)) {
       count++;
     } else {
@@ -64,7 +65,91 @@ function lengthAttributeSequence(
 
 interface AccumulatedStyle {
   content: NotionRenderChild;
-  attributes: Record<string, number>;
+  attributes: string[];
+}
+
+type AttributesCount = Record<string, number>;
+
+type MaxCounter = [number, number, string];
+
+function removeAttributeFromItem(item: NotionPageText, attName: string): void {
+  const ix = item.atts.findIndex(a => a.att === attName);
+  if (ix < 0) {
+    throw new Error(
+      `could not find attrubute ${attName} in ${JSON.stringify(item)}`,
+    );
+  }
+  item.atts.splice(ix, 1);
+}
+
+function renderSlices(
+  items: NotionPageText[],
+  from: number,
+  nbItems: number,
+  renderFuncs: NotionRenderFuncs,
+): NotionRenderChild[] {
+  // first pass we count the different sequences length
+  const attCounts: AttributesCount[] = [];
+  items.forEach(item => {
+    const counter: AttributesCount = {};
+    attCounts.push(counter);
+    item.atts.forEach(
+      a =>
+        (counter[a.att] = lengthAttributeSequence(items, a.att, from, nbItems)),
+    );
+  });
+  if (attCounts.length === 0) {
+    // this means that none of the elements have attributes
+    return items.map(item => renderFuncs.wrapText(item.text));
+  }
+  // let's find the longest sequence
+  // [0]: max seq length
+  // [1]: position where this seq appears
+  // [2]: associated attribute
+  const max: MaxCounter = [0, 0, ''];
+  attCounts.forEach((counter, index) => {
+    for (const key in counter) {
+      if (counter[key] > max[0]) {
+        max[0] = counter[key];
+        max[1] = index;
+        max[2] = key;
+      }
+    }
+  });
+  if (max[0] === 1) {
+    // this means that the sequences are at the most 1
+    // item long that means that there is no need to
+    // compose them in any specific way
+    return items.map(item => {
+      return item.atts.reduce<NotionRenderChild>((child, a) => {
+        return renderFuncs.renderTextAtt([child], a.att);
+      }, renderFuncs.wrapText(item.text));
+    });
+  }
+
+  // final case, at least one section has a sequence of attributes
+  const result: NotionRenderChild[] = [];
+  const [length, index0, attName] = max;
+  if (index0 > 0) {
+    result.push(renderSlices(items, 0, index0, renderFuncs));
+  }
+  // for the sequence in question, we need first to remove the attribute
+  // from the list of attributes before doing the (sub) rendering
+  for (let ix = index0; ix < index0 + length; ix++) {
+    removeAttributeFromItem(items[ix], attName);
+  }
+  result.push(
+    renderFuncs.renderTextAtt(
+      renderSlices(items, 0, index0, renderFuncs),
+      attName,
+    ),
+  );
+
+  // and we render the last chunk
+  if (index0 + length < nbItems) {
+    result.push(renderSlices(items, index0, length, renderFuncs));
+  }
+  return result;
 }
 
 // we want this kind of transformations:
@@ -72,26 +157,12 @@ interface AccumulatedStyle {
 // x:ab y:b => b(a(x) y)
 // x:a y:ab z:b => a(x b(y)) b(z) | a(x) b(a(y) z)
 // x:a y:ab z:a => a(x b(y) z)
+// x:a y:ab z:b t:b => a(x) b(y(a) z t)
 function renderTextItems(
   items: NotionPageText[],
   renderFuncs: NotionRenderFuncs,
 ): NotionRenderChild[] {
-  const children: NotionRenderChild[] = [];
-  const accumulated: AccumulatedStyle[] = [];
-  // first pass: we wrap the text and preare the data structure
-  // to track the attributes sequences length
-  items.forEach((item, index) => {
-    const acc: AccumulatedStyle = {
-      content: renderFuncs.wrapText(item.text),
-      attributes: {},
-    };
-    item.atts.forEach(
-      a =>
-        (acc.attributes[a.att] = lengthAttributeSequence(items, a.att, index)),
-    );
-    accumulated.push(acc);
-  });
-  return children;
+  return renderSlices(items, 0, items.length, renderFuncs);
 }
 
 export default function renderNotionText(
@@ -107,24 +178,12 @@ export default function renderNotionText(
     console.log('splits:', JSON.stringify(splits, null, '  '));
   }
   splits.forEach(({ ref, items }) => {
-    const children: NotionRenderChild[] = [];
-    items.forEach(item => {
-      if (!item.atts || item.atts.length === 0) {
-        children.push(renderFuncs.wrapText(item.text));
-      } else {
-        // TODO: bug here - won't work with text with mutiple rendering attributes
-        item.atts.forEach(a => {
-          children.push(
-            renderFuncs.renderTextAtt([renderFuncs.wrapText(item.text)], a.att),
-          );
-        });
-      }
-    });
+    const children: NotionRenderChild[] = renderTextItems(items, renderFuncs);
     if (ref === '') {
       // no link, we push all the rendered piece
       children.forEach(c => result.push(c));
     } else {
-      // we ahe a link: we pushed the rendered link
+      // we have a link: we pushed the rendered link
       result.push(renderFuncs.renderLink(children, ref));
     }
   });
