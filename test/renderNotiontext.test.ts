@@ -38,7 +38,7 @@ const fixtures: Fixtures = [
     out: 'my <i>tailor</i> is rich',
   },
   {
-    skip: true,
+    skip: false,
     in: [
       {
         text: 'my tailor ',
@@ -60,7 +60,7 @@ const fixtures: Fixtures = [
     out: 'my tailor <b>is</b> rich',
   },
   {
-    skip: true,
+    skip: false,
     in: [
       {
         text: 'my ',
@@ -94,7 +94,7 @@ const fixtures: Fixtures = [
     out: 'my <i>tailor</i> <b>is</b> rich',
   },
   {
-    skip: true,
+    skip: false,
     in: [
       {
         text: 'my ',
@@ -124,7 +124,7 @@ const fixtures: Fixtures = [
     out: 'my <s>tailor</s> is <b>rich</b>',
   },
   {
-    skip: true,
+    skip: false,
     in: [
       {
         text: 'my tailor is rich',
@@ -138,7 +138,7 @@ const fixtures: Fixtures = [
     out: '<b>my tailor is rich</b>',
   },
   {
-    skip: true,
+    skip: false,
     in: [
       {
         text: 'my',
@@ -188,7 +188,7 @@ const fixtures: Fixtures = [
     out: '<b>my</b> <i>tailor</i> <s>is</s> <b>rich</b>',
   },
   {
-    skip: true,
+    skip: false,
     in: [
       {
         text: 'This is a ',
@@ -211,7 +211,7 @@ const fixtures: Fixtures = [
     out: 'This is a <a href=https://www.google.com>link</a>.',
   },
   {
-    skip: true,
+    skip: false,
     in: [
       {
         text: 'This is a ',
@@ -255,7 +255,7 @@ const fixtures: Fixtures = [
     out: 'This is a <a href=https://dev.null>very <b>nice</b> link</a>.',
   },
   {
-    skip: true,
+    skip: false,
     in: [
       {
         text: "let's consider ",
@@ -297,7 +297,7 @@ const fixtures: Fixtures = [
       "let's consider <a href=https://www.google.com>a link with </a><a href=https://www.bing.com>a link</a><a href=https://www.google.com> in the anchor</a>, will you?",
   },
   {
-    skip: true,
+    skip: false,
     in: [
       {
         text: 'This is a ',
@@ -341,7 +341,7 @@ const fixtures: Fixtures = [
 ];
 
 describe('renderNotionText', () => {
-  it.skip('should render', () => {
+  it('should render', () => {
     const factory = renderFuncsForTests();
     const result = renderNotionText(
       [
@@ -393,6 +393,8 @@ describe('renderNotionText', () => {
       const factory = renderFuncsForTests();
       const result = renderNotionText(fixture.in, factory.renderFuncs());
       expect(factory.childrenToString(result)).toEqual(fixture.out);
+    } else {
+      console.log('... skipped');
     }
   });
 });
