@@ -48,12 +48,11 @@ function splitPerLinks(items: NotionPageText[]): LinkTextSplit[] {
 // the number of consecutive items having the same attribute set
 function lengthAttributeSequence(
   items: NotionPageText[],
-  att: string,
   index: number,
-  nbItems: number,
+  att: string,
 ): number {
   let count = 0;
-  for (let ix = index; ix < index + nbItems; ix++) {
+  for (let ix = index; ix < items.length; ix++) {
     if (items[ix].atts.find(a => a.att === att)) {
       count++;
     } else {
@@ -61,11 +60,6 @@ function lengthAttributeSequence(
     }
   }
   return count;
-}
-
-interface AccumulatedStyle {
-  content: NotionRenderChild;
-  attributes: string[];
 }
 
 type AttributesCount = Record<string, number>;
@@ -82,26 +76,41 @@ function removeAttributeFromItem(item: NotionPageText, attName: string): void {
   item.atts.splice(ix, 1);
 }
 
-function renderSlices(
+// may be a method exists in the std lib for Array
+function extractSubSlices(
   items: NotionPageText[],
   from: number,
-  nbItems: number,
+  to: number,
+): NotionPageText[] {
+  const result: NotionPageText[] = [];
+  for (let ix = from; ix < to; ix++) {
+    result.push(items[ix]);
+  }
+  return result;
+}
+
+function renderSlices(
+  items: NotionPageText[],
   renderFuncs: NotionRenderFuncs,
 ): NotionRenderChild[] {
+  // quick optimization: if no items in the sequence has any attributes
+  // then we can quickly return!
+  const hasAtLEastOneAttribute = !!items.find(item => item.atts.length > 0);
+  if (!hasAtLEastOneAttribute) {
+    return items.map(item => renderFuncs.wrapText(item.text));
+  }
   // first pass we count the different sequences length
   const attCounts: AttributesCount[] = [];
-  items.forEach(item => {
+  // for each attribute, for each item, we count the consecutive number items with
+  // the same attribute set
+  // we will use the longest sequence to be rendered last
+  items.forEach((item, index) => {
     const counter: AttributesCount = {};
     attCounts.push(counter);
     item.atts.forEach(
-      a =>
-        (counter[a.att] = lengthAttributeSequence(items, a.att, from, nbItems)),
+      a => (counter[a.att] = lengthAttributeSequence(items, index, a.att)),
     );
   });
-  if (attCounts.length === 0) {
-    // this means that none of the elements have attributes
-    return items.map(item => renderFuncs.wrapText(item.text));
-  }
   // let's find the longest sequence
   // [0]: max seq length
   // [1]: position where this seq appears
@@ -131,23 +140,23 @@ function renderSlices(
   const result: NotionRenderChild[] = [];
   const [length, index0, attName] = max;
   if (index0 > 0) {
-    result.push(renderSlices(items, 0, index0, renderFuncs));
+    const subslices = extractSubSlices(items, 0, index0);
+    result.push(renderSlices(subslices, renderFuncs));
   }
   // for the sequence in question, we need first to remove the attribute
   // from the list of attributes before doing the (sub) rendering
-  for (let ix = index0; ix < index0 + length; ix++) {
-    removeAttributeFromItem(items[ix], attName);
+  const subslices = extractSubSlices(items, index0, index0 + length);
+  for (let ix = 0; ix < subslices.length; ix++) {
+    removeAttributeFromItem(subslices[ix], attName);
   }
   result.push(
-    renderFuncs.renderTextAtt(
-      renderSlices(items, 0, index0, renderFuncs),
-      attName,
-    ),
+    renderFuncs.renderTextAtt(renderSlices(subslices, renderFuncs), attName),
   );
 
   // and we render the last chunk
-  if (index0 + length < nbItems) {
-    result.push(renderSlices(items, index0, length, renderFuncs));
+  if (index0 + length < items.length) {
+    const subslices = extractSubSlices(items, index0 + length, items.length);
+    result.push(renderSlices(subslices, renderFuncs));
   }
   return result;
 }
@@ -162,7 +171,7 @@ function renderTextItems(
   items: NotionPageText[],
   renderFuncs: NotionRenderFuncs,
 ): NotionRenderChild[] {
-  return renderSlices(items, 0, items.length, renderFuncs);
+  return renderSlices(items, renderFuncs);
 }
 
 export default function renderNotionText(
@@ -173,6 +182,8 @@ export default function renderNotionText(
   const result: NotionRenderChild[] = [];
   // we can split the input based on the links
   // it contains
+  // we need that as links texts cannnot be rendered across links
+  // each link test must be renderede independently from the others
   const splits = splitPerLinks(input);
   if (debug) {
     console.log('splits:', JSON.stringify(splits, null, '  '));

@@ -1,6 +1,6 @@
 import extractPageIdFromPublicUrl from '../src/util/extractPageIdFromPublicUrl';
 
-describe('extractPageIdFromPublicUrl', () => {
+describe.skip('extractPageIdFromPublicUrl', () => {
   it('should work with somewhat valid URL', () => {
     expect(
       extractPageIdFromPublicUrl(
