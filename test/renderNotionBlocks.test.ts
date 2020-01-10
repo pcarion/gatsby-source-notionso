@@ -668,7 +668,7 @@ const fixtures: Fixtures = [
   },
 ];
 
-describe('renderNotionBlocks', () => {
+describe.skip('renderNotionBlocks', () => {
   it.each(fixtures)('text : %#', fixture => {
     const debug = false;
     if (!fixture.skip) {

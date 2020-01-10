@@ -39,13 +39,6 @@ export default async function createNodeForPage(
         type: `NotionPage${pluginConfig.name}`,
       },
     });
-    // console.log('@@@@ loadPage:pageId:', pageId);
-    // console.log(
-    //   util.inspect(item, {
-    //     colors: true,
-    //     depth: null,
-    //   }),
-    // );
   } catch (err) {
     reporter.error(`Error loading page: ${pageId} - error is: ${err.message}`);
   }

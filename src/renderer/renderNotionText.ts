@@ -141,7 +141,7 @@ function renderSlices(
   const [length, index0, attName] = max;
   if (index0 > 0) {
     const subslices = extractSubSlices(items, 0, index0);
-    result.push(renderSlices(subslices, renderFuncs));
+    result.push(...renderSlices(subslices, renderFuncs));
   }
   // for the sequence in question, we need first to remove the attribute
   // from the list of attributes before doing the (sub) rendering
@@ -156,7 +156,7 @@ function renderSlices(
   // and we render the last chunk
   if (index0 + length < items.length) {
     const subslices = extractSubSlices(items, index0 + length, items.length);
-    result.push(renderSlices(subslices, renderFuncs));
+    result.push(...renderSlices(subslices, renderFuncs));
   }
   return result;
 }

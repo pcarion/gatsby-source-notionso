@@ -388,7 +388,7 @@ describe('renderNotionText', () => {
     );
   });
 
-  it.each(fixtures)('text : %#', fixture => {
+  it.skip.each(fixtures)('text : %#', fixture => {
     if (!fixture.skip) {
       const factory = renderFuncsForTests();
       const result = renderNotionText(fixture.in, factory.renderFuncs());
