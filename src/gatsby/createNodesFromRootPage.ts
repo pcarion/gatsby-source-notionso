@@ -1,4 +1,4 @@
-import { Reporter, Actions, NodePluginArgs } from 'gatsby';
+import { Reporter, Actions, NodePluginArgs, NodeInput } from 'gatsby';
 import { NotionsoPluginOptions } from '../types/notion';
 
 import notionLoader from '../notion/notionLoader';
@@ -10,6 +10,7 @@ export default async function createNodesFromRootPage(
   rootPageId: string,
   createNodeId: NodePluginArgs['createNodeId'],
   createNode: Actions['createNode'],
+  createParentChildLink: Actions['createParentChildLink'],
   createContentDigest: NodePluginArgs['createContentDigest'],
   getNodes: NodePluginArgs['getNodes'],
   store: NodePluginArgs['store'],
@@ -24,6 +25,8 @@ export default async function createNodesFromRootPage(
     // loading the root page
     const item = await loadPage(rootPageId, '', 0, loader, reporter);
 
+    const pageNodesDict: Record<string, NodeInput> = {};
+
     // we are interested only by the linked pages from the root page
     let index = 0;
     for (const linkedPage of item.linkedPages) {
@@ -34,7 +37,7 @@ export default async function createNodesFromRootPage(
       // (to avoid keeping around too many blocks)
       loader.reset();
 
-      await createNodeForPage(
+      const pageNode = await createNodeForPage(
         pageId,
         rootPageId,
         title,
@@ -46,12 +49,20 @@ export default async function createNodesFromRootPage(
         pluginConfig,
         reporter,
       );
+      // we crate a dictionary of the page nodes
+      // will be used to create the link between a
+      // page and its images
+      if (pageNode) {
+        pageNodesDict[pageId] = pageNode as NodeInput;
+      }
     }
     // we download all the images found
     // in the various pages
     await downloadNotionImages(
+      pageNodesDict,
       getNodes,
       createNode,
+      createParentChildLink,
       createNodeId,
       store,
       cache,
@@ -61,6 +72,7 @@ export default async function createNodesFromRootPage(
       reporter,
     );
   } catch (err) {
+    console.log(err);
     reporter.error(
       `Error loading root page: ${rootPageId} - error is: ${err.message}`,
     );

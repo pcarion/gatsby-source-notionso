@@ -15,7 +15,7 @@ export default async function createNodeForPage(
   createContentDigest: NodePluginArgs['createContentDigest'],
   pluginConfig: NotionsoPluginOptions,
   reporter: Reporter,
-): Promise<void> {
+): Promise<object | null> {
   try {
     // loading page
     const item = await loadPage(
@@ -26,7 +26,7 @@ export default async function createNodeForPage(
       reporter,
     );
     const nodeId = createNodeId(pageId);
-    createNode({
+    const node = {
       ...item,
       indexPage: index,
       id: nodeId,
@@ -38,8 +38,11 @@ export default async function createNodeForPage(
         contentDigest: createContentDigest(item),
         type: `NotionPage${pluginConfig.name}`,
       },
-    });
+    };
+    createNode(node);
+    return node;
   } catch (err) {
     reporter.error(`Error loading page: ${pageId} - error is: ${err.message}`);
+    return null;
   }
 }

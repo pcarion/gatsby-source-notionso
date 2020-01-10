@@ -28,7 +28,7 @@ export const sourceNodes: GatsbyNode['sourceNodes'] = async (
     createContentDigest,
     reporter,
   } = context;
-  const { createNode } = actions;
+  const { createNode, createParentChildLink } = actions;
   if (!rootPageUrl) {
     reporter.panic(
       'gatsby-source-notionso requires a rootPageUrl parameter. This is the id of the root page for your notion content',
@@ -53,6 +53,7 @@ export const sourceNodes: GatsbyNode['sourceNodes'] = async (
     rootPageId,
     createNodeId,
     createNode,
+    createParentChildLink,
     createContentDigest,
     getNodes,
     store,
@@ -114,6 +115,7 @@ export const createSchemaCustomization: GatsbyNode['createSchemaCustomization'] 
       createdAt: Date!
       blocks: [NotionPage${pluginConfig.name}Block!]
       images: [NotionPage${pluginConfig.name}Image!]
+      imageAssets: [NotionPageAsset${pluginConfig.name}!]
       linkedPages: [NotionPage${pluginConfig.name}LinkedPage!]
     }
   `;

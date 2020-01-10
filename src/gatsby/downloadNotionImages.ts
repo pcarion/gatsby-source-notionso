@@ -1,4 +1,4 @@
-import { Reporter, Actions, NodePluginArgs } from 'gatsby';
+import { Reporter, Actions, NodePluginArgs, NodeInput, Node } from 'gatsby';
 
 import { createRemoteFileNode } from 'gatsby-source-filesystem';
 import {
@@ -12,8 +12,10 @@ import {
 // https://www.gatsbyjs.org/packages/gatsby-source-filesystem/#createremotefilenode
 
 export default async function downloadNotionImages(
+  pageNodesDict: Record<string, NodeInput>,
   getNodes: NodePluginArgs['getNodes'],
   createNode: Actions['createNode'],
+  createParentChildLink: Actions['createParentChildLink'],
   createNodeId: NodePluginArgs['createNodeId'],
   store: NodePluginArgs['store'],
   cache: NodePluginArgs['cache'],
@@ -22,6 +24,10 @@ export default async function downloadNotionImages(
   pluginConfig: NotionsoPluginOptions,
   reporter: Reporter,
 ): Promise<void> {
+  // we retrieve all the notion nodes which have been created
+  // and we see if they have images associated to them
+  // TODO: add filtering pertype (eg. NotionPageBlog) to allow
+  // multiple instanes of the plugin to coexist
   const imagesNodes: GatsbyNotionsoNode[] = getNodes().filter(
     (n: GatsbyNotionsoNode) => {
       return n.internal && n.internal.owner === 'gatsby-source-notionso';
@@ -53,10 +59,13 @@ export default async function downloadNotionImages(
     const item = {
       notionUrl,
       pageId,
+      // check:
+      // https://www.gatsbyjs.org/docs/node-creation/#foreign-key-reference-___node
+      // https://www.gatsbyjs.org/docs/schema-gql-type#foreign-key-reference-___node
       // eslint-disable-next-line @typescript-eslint/camelcase
       localFile___NODE: fileNode.id,
     };
-    createNode({
+    const assetNode: NodeInput = {
       ...item,
       id: assetNodeId,
       _id: assetNodeId,
@@ -66,6 +75,18 @@ export default async function downloadNotionImages(
         contentDigest: createContentDigest(item),
         type: `NotionPageAsset${pluginConfig.name}`,
       },
-    });
+    };
+    createNode(assetNode);
+    // create the link between the page and its images
+    // https://www.gatsbyjs.org/docs/actions/#createParentChildLink
+    const pageNode = pageNodesDict[pageId];
+    if (pageNode) {
+      createParentChildLink({
+        parent: pageNode as Node,
+        child: assetNode as Node,
+      });
+    } else {
+      reporter.error(`Could not find page node for pageId:${pageId}`);
+    }
   }
 }
