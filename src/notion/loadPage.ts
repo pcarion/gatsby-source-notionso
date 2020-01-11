@@ -46,6 +46,7 @@ function getPropertyText(
   return property.value;
 }
 
+// loads a gatsby page
 export default async function loadPage(
   pageId: string,
   rootPageId: string,
@@ -74,6 +75,7 @@ export default async function loadPage(
   let hasExcerpt = false;
   let excerpt = '';
 
+  // parse all the blocks retrived from notion
   for (const blockId of page.blockIds) {
     const block = notionLoader.getBlockById(blockId);
     if (!block) {
@@ -128,6 +130,8 @@ export default async function loadPage(
     }
   }
 
+  // default meta value for the page
+  // can be overriden from the page, using a quote block
   let slug = `${indexPage}`;
   let createdAt = new Date().toISOString();
   let isDraft = false;

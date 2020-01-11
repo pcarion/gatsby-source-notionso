@@ -65,26 +65,23 @@ export interface NotionsoPluginOptions extends PluginOptions {
   debug?: boolean;
 }
 
+export interface NotionLoaderImageInformation {
+  imageUrl: string;
+  contentId: string;
+}
+
+export interface NotionLoaderImageResult {
+  imageUrl: string;
+  contentId: string;
+  signedImageUrl: string;
+}
+
 export interface NotionLoader {
   loadPage(pageId: string): Promise<void>;
   downloadImages(
-    images: [string, string, string][],
-  ): Promise<[string, string, string][]>;
+    images: NotionLoaderImageInformation[],
+  ): Promise<NotionLoaderImageResult[]>;
   getBlockById(blockId: string): NotionPageBlock | undefined;
   getBlocks(copyTo: NotionPageBlock[], pageId: string): void;
   reset(): void;
-}
-
-export interface GatsbyNotionsoNode {
-  id: string; // Gatsby node ID
-  parent?: string | null;
-  children?: string[];
-  internal?: {
-    mediaType?: string;
-    type: string;
-    contentDigest: string;
-    owner: string;
-  };
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  [key: string]: any;
 }

@@ -4,12 +4,12 @@ import { NotionsoPluginOptions } from '../types/notion';
 import notionLoader from '../notion/notionLoader';
 import loadPage from '../notion/loadPage';
 import createNodeForPage from './createNodeForPage';
-import downloadNotionImages from '../gatsby/downloadNotionImages';
 
 export default async function createNodesFromRootPage(
   rootPageId: string,
   createNodeId: NodePluginArgs['createNodeId'],
   createNode: Actions['createNode'],
+  createParentChildLink: Actions['createParentChildLink'],
   createContentDigest: NodePluginArgs['createContentDigest'],
   getNodes: NodePluginArgs['getNodes'],
   store: NodePluginArgs['store'],
@@ -43,24 +43,14 @@ export default async function createNodesFromRootPage(
         createNodeId,
         createNode,
         createContentDigest,
+        store,
+        cache,
         pluginConfig,
         reporter,
       );
     }
-    // we download all the images found
-    // in the various pages
-    await downloadNotionImages(
-      getNodes,
-      createNode,
-      createNodeId,
-      store,
-      cache,
-      createContentDigest,
-      loader,
-      pluginConfig,
-      reporter,
-    );
   } catch (err) {
+    console.log(err);
     reporter.error(
       `Error loading root page: ${rootPageId} - error is: ${err.message}`,
     );
