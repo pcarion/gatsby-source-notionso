@@ -36,6 +36,8 @@ export default async function createNodeForPage(
   reporter: Reporter,
 ): Promise<object | null> {
   try {
+    const { debug } = pluginConfig;
+
     // loading page
     const item = await loadPage(
       pageId,
@@ -53,7 +55,11 @@ export default async function createNodeForPage(
       });
     }
     const imagesResult = await notionLoader.downloadImages(imagesToDownload);
-    reporter.info(`Images for notion source: ${JSON.stringify(imagesResult)}`);
+    if (debug) {
+      reporter.info(
+        `Images for notion source: ${JSON.stringify(imagesResult)}`,
+      );
+    }
     const imageNodeIds: string[] = [];
 
     // we build a node per image

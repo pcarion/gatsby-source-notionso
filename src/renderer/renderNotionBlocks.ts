@@ -25,7 +25,7 @@ function addPropertiesToDict(block: Block, dict: Record<string, string>): void {
 
 function addAttributesToDict(block: Block, dict: Record<string, string>): void {
   block.attributes.forEach(a => {
-    dict[a.att] = a.value || '';
+    dict[a.att] = `${a.value}` || '';
   });
 }
 

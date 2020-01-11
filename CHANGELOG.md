@@ -3,6 +3,11 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## 0.0.6 - 2020-01-11
+### Changed
+- remove extra logs
+- force meta information to be all strings
+
 ## 0.0.5 - 2020-01-11
 ### Added
 - added a direct relation between a page and the images it contains
