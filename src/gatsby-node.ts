@@ -75,12 +75,6 @@ export const createSchemaCustomization: GatsbyNode['createSchemaCustomization'] 
       pageId: String!
     }
 
-    type NotionPage${pluginConfig.name}Image {
-      notionUrl: String!
-      signedUrl: String!
-      contentId: String!
-    }
-
     type NotionPage${pluginConfig.name}Att {
       att: String!
       value: String
@@ -104,7 +98,13 @@ export const createSchemaCustomization: GatsbyNode['createSchemaCustomization'] 
       blockIds: [String!]
     }
 
-    type NotionPage${pluginConfig.name} implements Node @dontInfer {
+    type NotionPageImage${pluginConfig.name} implements Node {
+      imageUrl: String!
+      contentId: String!
+      pageId: String!
+    }
+
+    type NotionPage${pluginConfig.name} implements Node {
       pageId: String!
       title: String!
       indexPage: Int!
@@ -114,8 +114,7 @@ export const createSchemaCustomization: GatsbyNode['createSchemaCustomization'] 
       pageIcon: String!
       createdAt: Date!
       blocks: [NotionPage${pluginConfig.name}Block!]
-      images: [NotionPage${pluginConfig.name}Image!]
-      imageAssets: [NotionPageAsset${pluginConfig.name}!]
+      imageNodeIds: [String!]
       linkedPages: [NotionPage${pluginConfig.name}LinkedPage!]
     }
   `;

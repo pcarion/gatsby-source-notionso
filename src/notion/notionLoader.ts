@@ -1,7 +1,12 @@
 import * as util from 'util';
 import axios, { AxiosRequestConfig } from 'axios';
 import { Reporter } from 'gatsby';
-import { NotionLoader, NotionPageBlock } from '../types/notion';
+import {
+  NotionLoader,
+  NotionPageBlock,
+  NotionLoaderImageInformation,
+  NotionLoaderImageResult,
+} from '../types/notion';
 import recordMapToBlocks from './parser/recordMapToBlocks';
 
 interface NotionApiDownloadInfo {
@@ -11,6 +16,7 @@ interface NotionApiDownloadInfo {
     id: string;
   };
 }
+
 export default function notionLoader(
   reporter: Reporter,
   debug = true,
@@ -82,17 +88,17 @@ export default function notionLoader(
         });
     },
     downloadImages(
-      images: [string, string, string][],
-    ): Promise<[string, string, string][]> {
+      images: NotionLoaderImageInformation[],
+    ): Promise<NotionLoaderImageResult[]> {
       const urlGetSignedFileUrls =
         'https://www.notion.so/api/v3/getSignedFileUrls';
       const urls: NotionApiDownloadInfo[] = [];
-      images.forEach(([imageUrl, contentId]) => {
+      images.forEach(image => {
         urls.push({
-          url: imageUrl,
+          url: image.imageUrl,
           permissionRecord: {
             table: 'block',
-            id: contentId,
+            id: image.contentId,
           },
         });
       });
@@ -115,7 +121,7 @@ export default function notionLoader(
         url: urlGetSignedFileUrls,
       };
 
-      const result: [string, string, string][] = [];
+      const result: NotionLoaderImageResult[] = [];
 
       return axios(options)
         .then(function(response) {
@@ -138,7 +144,11 @@ export default function notionLoader(
                 (response.data.signedUrls as string[])) ||
               ([] as string[])
             ).forEach((signedUrl, index) => {
-              result.push([images[index][0], signedUrl, images[index][2]]);
+              result.push({
+                imageUrl: images[index].imageUrl,
+                contentId: images[index].contentId,
+                signedImageUrl: signedUrl,
+              });
             });
           }
           return result;
