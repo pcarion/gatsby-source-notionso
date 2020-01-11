@@ -30,6 +30,13 @@ export interface NotionPageImage {
   contentId: string;
 }
 
+export interface NotionImageNodes {
+  imageUrl: string;
+  localFile: {
+    publicURL: string;
+  };
+}
+
 export interface NotionPageLinkedPage {
   title: string;
   pageId: string;

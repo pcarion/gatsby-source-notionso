@@ -1,8 +1,14 @@
-import { NotionPageBlock, NotionPageText } from '../types/notion';
+import {
+  NotionPageBlock,
+  NotionPageText,
+  NotionImageNodes,
+} from '../types/notion';
 
 import { NotionRenderFuncs, NotionRenderChild, BlockMeta } from './index';
+import { RenderUtils } from './renderUtils';
 
 import renderNotionText from './renderNotionText';
+import renderUtilsFacory from './renderUtils';
 
 import notionPageTextToString from '../notion/parser/notionPageTextToString';
 
@@ -134,6 +140,7 @@ function buildTree(
 function renderBlock(
   root: Block,
   renderFuncs: NotionRenderFuncs,
+  renderUtils: RenderUtils,
   debug: boolean,
 ): NotionRenderChild {
   const children: NotionRenderChild[] = [];
@@ -141,13 +148,21 @@ function renderBlock(
   const meta: BlockMeta = {};
   addPropertiesToDict(root, meta);
   addAttributesToDict(root, meta);
+  if (root.type === 'image') {
+    const url = renderUtils.publicUrl(meta.source);
+    if (!url) {
+      console.log(`caanot find public url for image: ${JSON.stringify(meta)}`);
+    }
+    // TODO: default image?
+    meta.publicImageUrl = url || '';
+  }
   if (hasProperty(root, 'title') && root.type !== 'page') {
     const texts = findTextProperty(root, 'title');
-    const textBlocks = renderNotionText(texts, renderFuncs, debug);
+    const textBlocks = renderNotionText(texts, renderFuncs, renderUtils, debug);
     textBlocks.forEach(b => children.push(b));
   }
   root._subBlocks.forEach(block => {
-    children.push(renderBlock(block, renderFuncs, debug));
+    children.push(renderBlock(block, renderFuncs, renderUtils, debug));
   });
   const result = renderFuncs.renderBlock(root.type, meta, children);
   return result;
@@ -156,6 +171,7 @@ function renderBlock(
 export default function renderPageblocks(
   pageId: string,
   blocks: NotionPageBlock[],
+  imageNodes: NotionImageNodes[],
   renderFuncs: NotionRenderFuncs,
   debug = false,
 ): NotionRenderChild {
@@ -180,5 +196,6 @@ export default function renderPageblocks(
     );
   }
 
-  return renderBlock(aggregatedRootBlock, renderFuncs, debug);
+  const renderUtils = renderUtilsFacory(imageNodes);
+  return renderBlock(aggregatedRootBlock, renderFuncs, renderUtils, debug);
 }

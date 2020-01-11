@@ -1,9 +1,23 @@
 import renderNotionBlocks from './renderNotionBlocks';
-import { NotionPageDescription } from '../types/notion';
+import { NotionPageBlock, NotionImageNodes } from '../types/notion';
 
 export type BlockMeta = Record<string, string>;
 
 export type NotionRenderChild = object;
+
+export interface NotionPageToRender {
+  title: string;
+  pageId: string;
+  slug: string;
+  isDraft: boolean;
+  indexPage: number;
+  id: string;
+  excerpt: string;
+  pageIcon: string;
+  createdAt: string;
+  blocks: NotionPageBlock[];
+  imageNodes: NotionImageNodes[];
+}
 
 export interface NotionRenderFuncs {
   // span rendering
@@ -23,8 +37,8 @@ export interface NotionRenderFuncs {
 }
 
 type NotionRendererParam = {
-  notionPage: NotionPageDescription;
-  allNotionPageAsset: object;
+  notionPage: NotionPageToRender;
+  debug?: boolean;
 };
 
 type NotionPageRenderer = {
@@ -35,18 +49,19 @@ type NotionPageRendererFactory = (
   arg: NotionRendererParam,
 ) => NotionPageRenderer;
 
-const renderer: NotionPageRendererFactory = ({
-  notionPage,
-  allNotionPageAsset,
-}) => {
+const renderer: NotionPageRendererFactory = ({ notionPage, debug }) => {
   return {
     render: (renderFuncs: NotionRenderFuncs): object => {
-      console.log('From: gatsy-source-notionso/renderer:');
-      console.log('notionPage:', notionPage);
-      console.log('allNotionPageAsset:', allNotionPageAsset);
       const pageId = notionPage.pageId;
       const blocks = notionPage.blocks;
-      const result = renderNotionBlocks(pageId, blocks, renderFuncs);
+      const imageNodes = notionPage.imageNodes;
+      const result = renderNotionBlocks(
+        pageId,
+        blocks,
+        imageNodes,
+        renderFuncs,
+        !!debug,
+      );
       return result;
     },
   };

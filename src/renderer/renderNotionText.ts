@@ -1,6 +1,7 @@
 import * as _ from 'lodash';
 import { NotionPageText } from '../types/notion';
 import { NotionRenderChild, NotionRenderFuncs } from './index';
+import { RenderUtils } from './renderUtils';
 
 type LinkTextSplit = { ref: string; items: NotionPageText[] };
 
@@ -177,6 +178,7 @@ function renderTextItems(
 export default function renderNotionText(
   input: NotionPageText[],
   renderFuncs: NotionRenderFuncs,
+  renderUtils: RenderUtils,
   debug = false,
 ): NotionRenderChild[] {
   const result: NotionRenderChild[] = [];
