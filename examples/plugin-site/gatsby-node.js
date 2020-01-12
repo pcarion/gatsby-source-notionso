@@ -27,7 +27,7 @@ exports.createPages = async ({ graphql, actions, reporter }, options) => {
   }
 
   result.data.allNotionPageBlog.edges.forEach(({ node }) => {
-    const path = `/article/${node.slug}`;
+    const path = `/gatsby-source-notion-so/${node.slug}`;
     createPage({
       path,
       component: pageTemplate,

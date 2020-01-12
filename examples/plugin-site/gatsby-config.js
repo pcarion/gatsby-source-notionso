@@ -1,7 +1,8 @@
 module.exports = {
   siteMetadata: {
     title: 'gatsby-plugin-notionso example site',
-    description: 'how to use gatsby-plugin-notionso',
+    description:
+      'series of article to explain how to use gatsby-plugin-notionso',
     basePath: '/',
   },
   plugins: [

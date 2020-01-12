@@ -10,7 +10,7 @@ const IndexPage = ({ data }) => {
       {data.allNotionPageBlog.edges.map(edge => (
         <ArticleBlockLink
           title={edge.node.title}
-          link={`/article/${edge.node.slug}`}
+          link={`/gatsby-source-notion-so/${edge.node.slug}`}
           excerpt={edge.node.excerpt}
           icon={edge.node.pageIcon}
         />
@@ -25,19 +25,11 @@ export const query = graphql`
   query {
     allNotionPageBlog(
       filter: { isDraft: { eq: false } }
-      sort: { fields: [indexPage], order: DESC }
+      sort: { fields: [indexPage], order: ASC }
     ) {
       edges {
         node {
-          linkedPages {
-            pageId
-            title
-          }
-          pageId
           title
-          indexPage
-          isDraft
-          createdAt
           slug
           excerpt
           pageIcon
