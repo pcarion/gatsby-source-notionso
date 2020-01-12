@@ -1,15 +1,14 @@
+/* eslint-disable */
 import React from 'react';
-import Layout from 'theme-common/src/components/layout';
-import HpArticleBlockLink from 'theme-common/src/components/hpArticleBlockLink';
+import Layout from '../components/Layout';
+import ArticleBlockLink from '../components/ArticleBlockLink';
 import { graphql } from 'gatsby';
-import useSiteMetadata from '../hooks/use-site-metadata';
 
-const Page = ({ data }) => {
-  const meta = useSiteMetadata();
+const IndexPage = ({ data }) => {
   return (
-    <Layout meta={meta}>
+    <Layout>
       {data.allNotionPageBlog.edges.map(edge => (
-        <HpArticleBlockLink
+        <ArticleBlockLink
           title={edge.node.title}
           link={`/article/${edge.node.slug}`}
           excerpt={edge.node.excerpt}
@@ -20,7 +19,7 @@ const Page = ({ data }) => {
   );
 };
 
-export default Page;
+export default IndexPage;
 
 export const query = graphql`
   query {
