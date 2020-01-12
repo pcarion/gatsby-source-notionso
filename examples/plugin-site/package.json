@@ -1,0 +1,22 @@
+{
+  "name": "gatsby-source-notionso-site",
+  "description": "The example site for gatsby-source-notion-so.",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "scripts": {
+    "build": "gatsby build",
+    "clean": "gatsby clean",
+    "develop": "gatsby clean && gatsby develop",
+    "deploy": "gatsby clean && gatsby build && gh-pages -d public"
+  },
+  "dependencies": {
+    "gatsby": "^2.18.21",
+    "gatsby-source-notionso": "^0.0.6",
+    "react": "^16.12.0",
+    "react-dom": "^16.12.0"
+  },
+  "peerDependencies": {
+    "prettier": "^1.19.1"
+  }
+}
