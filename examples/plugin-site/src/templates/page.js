@@ -3,7 +3,7 @@
 import React from 'react';
 import { graphql } from 'gatsby';
 import notionRendererFactory from 'gatsby-source-notionso/lib/renderer';
-import Layout from '../components/layout';
+import Layout from '../components/Layout';
 import NotionBlockRenderer from '../components/notionBlockRenderer';
 
 const Template = ({ data, pageContext }) => {
