@@ -8,7 +8,7 @@ import hljs_bash from 'highlight.js/lib/languages/bash';
 import hljs_plaintext from 'highlight.js/lib/languages/plaintext';
 import hljs_json from 'highlight.js/lib/languages/json';
 
-import Title from './title';
+import Title from './Title';
 import './styles.css';
 import 'highlight.js/styles/github.css';
 
