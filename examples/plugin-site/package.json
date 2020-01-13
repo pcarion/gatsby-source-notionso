@@ -1,6 +1,6 @@
 {
   "name": "gatsby-source-notionso-site",
-  "description": "The example site for gatsby-source-notion-so.",
+  "description": "The example site for gatsby-source-notionso.",
   "version": "1.0.0",
   "main": "index.js",
   "license": "MIT",

@@ -1,7 +1,5 @@
 /* eslint-disable */
 
-const path = require('path');
-
 exports.createPages = async ({ graphql, actions, reporter }, options) => {
   const { createPage } = actions;
 
@@ -27,7 +25,7 @@ exports.createPages = async ({ graphql, actions, reporter }, options) => {
   }
 
   result.data.allNotionPageBlog.edges.forEach(({ node }) => {
-    const path = `/gatsby-source-notion-so/${node.slug}`;
+    const path = `/gatsby-source-notionso/${node.slug}`;
     createPage({
       path,
       component: pageTemplate,

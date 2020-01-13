@@ -10,7 +10,7 @@ const IndexPage = ({ data }) => {
       {data.allNotionPageBlog.edges.map(edge => (
         <ArticleBlockLink
           title={edge.node.title}
-          link={`/gatsby-source-notion-so/${edge.node.slug}`}
+          link={`/gatsby-source-notionso/${edge.node.slug}`}
           excerpt={edge.node.excerpt}
           icon={edge.node.pageIcon}
         />

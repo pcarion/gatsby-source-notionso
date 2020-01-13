@@ -1,7 +1,7 @@
 {
   "name": "gatsby-source-notionso",
   "description": "A Gatsby source plugin for sourcing data into your Gatsby application using Notion.so as a backend.",
-  "version": "0.0.6",
+  "version": "1.0.0",
   "main": "index.js",
   "repository": "https://github.com/pcarion/gatsby-source-notionso.git",
   "author": "Pierre Carion <pcarion@gmail.com>",
@@ -13,6 +13,12 @@
     "watch": "tsc --watch",
     "prepublishOnly": "npm run build && npm test"
   },
+  "keywords": [
+    "gatsby",
+    "gatsby-plugin",
+    "gatsby-source-notionso",
+    "notionso"
+  ],
   "peerDependencies": {
     "gatsby": "^2.18.17"
   },
