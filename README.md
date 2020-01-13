@@ -10,7 +10,7 @@ You can find a detailed description about this plugin at: http://www.gatsbyplugi
 
 ## Screenshot
 
-![notion.so web side by side](/images/notionso-web-sidebyside.png)
+![notion.so web side by side](https://github.com/pcarion/gatsby-source-notionso/raw/master/images/notionso-web-sidebyside.png)
 
 ## Demo site
 
