@@ -7,6 +7,15 @@ module.exports = {
   },
   plugins: [
     {
+      resolve: `gatsby-plugin-google-analytics`,
+      options: {
+        trackingId: "UA-156098793-1",
+        head: true,
+        anonymize: true,
+        respectDNT: true,
+      },
+    },
+    {
       resolve: 'gatsby-source-notionso',
       options: {
         name: 'Blog',

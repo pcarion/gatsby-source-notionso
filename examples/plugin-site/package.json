@@ -13,6 +13,7 @@
   "dependencies": {
     "bulma": "^0.8.0",
     "gatsby": "^2.18.21",
+    "gatsby-plugin-google-analytics": "^2.1.32",
     "gatsby-source-notionso": "^0.0.6",
     "highlight.js": "^9.17.1",
     "react": "^16.12.0",
