@@ -1,3 +1,5 @@
+[![npm version](https://badge.fury.io/js/gatsby-source-notionso.svg)](https://badge.fury.io/js/gatsby-source-notionso)
+
 # gatsby-source-notionso
 
 A Gatsby source plugin for sourcing data into your [Gatsby](https://www.gatsbyjs.org/) application using [Notion.so](https://www.notion.so) as a backend.
