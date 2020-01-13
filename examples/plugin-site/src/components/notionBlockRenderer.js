@@ -28,11 +28,13 @@ const notionLanguageToHljs = {
 
 function renderBlockImage(meta) {
   return (
-    <img
-      src={meta.publicImageUrl}
-      style={{ width: `${meta.width}px` }}
-      alt=""
-    />
+    <div className="nso-image">
+      <img
+        src={meta.publicImageUrl}
+        style={{ width: `${meta.width}px` }}
+        alt=""
+      />
+    </div>
   );
 }
 

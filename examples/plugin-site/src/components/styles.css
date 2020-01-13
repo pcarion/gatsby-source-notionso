@@ -1,0 +1,42 @@
+.nso-italic {
+  font-style: italic;
+}
+
+.nso-bold {
+  font-style: normal;
+  font-weight: bold;
+}
+
+.nso-stroke {
+  text-decoration: line-through
+}
+
+.nso-para {
+  padding-bottom: 4px;
+  padding-top: 4px;
+}
+
+.nso-image {
+  padding-bottom: 4px;
+  padding-top: 4px;
+}
+
+img {
+  padding:1px;
+  border:1px solid #021a40;
+  background-color:#fff;
+}
+
+.nso-code {
+  font-family:'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, Courier, monospace;
+  line-height:normal;
+  background:rgba(135,131,120,0.15);
+  color:#EB5757;
+  border-radius:3px;
+  font-size:85%;
+  padding:0.2em 0.4em
+}
+
+.nso-title {
+  padding-bottom: 8px;
+}
