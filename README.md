@@ -6,6 +6,10 @@ There is not yet an official API to retrieve data for your pages, so this plugin
 
 You can find a detailed description about this plugin at: http://www.gatsbyplugins.com
 
+## Screenshot
+
+![notion.so web side by side](/images/notionso-web-sidebyside.png)
+
 ## Demo site
 
 [![Netlify Status](https://api.netlify.com/api/v1/badges/dfab5a71-603a-4065-88fd-cf5a24194bc6/deploy-status)](https://app.netlify.com/sites/gatsbyplugins/deploys)
