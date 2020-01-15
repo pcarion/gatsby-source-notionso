@@ -20,7 +20,7 @@ module.exports = {
       options: {
         name: 'Blog',
         rootPageUrl: process.env.GATSBY_NOTIONSO_ROOT_PAGE_URL,
-        debug: false,
+        debug: true,
       },
     },
     {

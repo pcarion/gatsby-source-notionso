@@ -127,6 +127,11 @@ function buildTree(
     ...block,
     _subBlocks: [],
   };
+  // we ignore those blocks for now
+  // see issue: https://github.com/pcarion/gatsby-source-notionso/issues/15
+  if (block.type === 'toggle') {
+    return root;
+  }
   block.blockIds.forEach(id => {
     const subBlock = findBlockById(id, blocks);
     if (!subBlock) {
@@ -151,7 +156,7 @@ function renderBlock(
   if (root.type === 'image') {
     const url = renderUtils.publicUrl(meta.source);
     if (!url) {
-      console.log(`caanot find public url for image: ${JSON.stringify(meta)}`);
+      console.log(`cannot find public url for image: ${JSON.stringify(meta)}`);
     }
     // TODO: default image?
     meta.publicImageUrl = url || '';

@@ -1,6 +1,7 @@
 import renderNotionText from '../src/renderer/renderNotionText';
 import { NotionPageText } from '../src/types/notion';
 import renderFuncsForTests from './renderFuncsForTests';
+import renderUtilsForTests from './renderUtilsForTests';
 
 type Fixtures = { skip: boolean; in: NotionPageText[]; out: string }[];
 
@@ -382,16 +383,21 @@ describe('renderNotionText', () => {
         },
       ],
       factory.renderFuncs(),
+      renderUtilsForTests(),
     );
     expect(factory.childrenToString(result)).toEqual(
       'Hello <b>world <i>are</i> you</b> crazy?',
     );
   });
 
-  it.skip.each(fixtures)('text : %#', fixture => {
+  it.each(fixtures)('text : %#', fixture => {
     if (!fixture.skip) {
       const factory = renderFuncsForTests();
-      const result = renderNotionText(fixture.in, factory.renderFuncs());
+      const result = renderNotionText(
+        fixture.in,
+        factory.renderFuncs(),
+        renderUtilsForTests(),
+      );
       expect(factory.childrenToString(result)).toEqual(fixture.out);
     } else {
       console.log('... skipped');

@@ -668,7 +668,7 @@ const fixtures: Fixtures = [
   },
 ];
 
-describe.skip('renderNotionBlocks', () => {
+describe('renderNotionBlocks', () => {
   it.each(fixtures)('text : %#', fixture => {
     const debug = false;
     if (!fixture.skip) {
@@ -676,6 +676,7 @@ describe.skip('renderNotionBlocks', () => {
       const result = renderNotionBlocks(
         fixture.pageId,
         fixture.in,
+        [],
         factory.renderFuncs(),
         debug,
       );

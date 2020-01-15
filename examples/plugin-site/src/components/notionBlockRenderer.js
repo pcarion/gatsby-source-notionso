@@ -119,6 +119,10 @@ function renderBlock(type, meta, children) {
     case 'bulleted_list__item':
       return renderListItem(children);
 
+    case '__meta':
+      // we don't parse this block - it contains the pahe meta information such as the slug
+      return null;
+
     default:
       console.log('@@@ unknow type to render>renderBlock>', type);
       return null;
