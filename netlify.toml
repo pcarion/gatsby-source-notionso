@@ -11,5 +11,5 @@
   publish = "public"
 
   # Default build command.
-  command = "yarn run build"
+  command = "scripts/build_for_netlify.sh"
 
