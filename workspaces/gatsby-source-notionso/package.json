@@ -1,0 +1,52 @@
+{
+  "name": "gatsby-source-notionso",
+  "description": "A Gatsby source plugin for sourcing data into your Gatsby application using Notion.so as a backend.",
+  "version": "1.0.3",
+  "main": "index.js",
+  "repository": "https://github.com/pcarion/gatsby-source-notionso.git",
+  "homepage": "https://www.gatsbyplugins.com",
+  "author": "Pierre Carion <pcarion@gmail.com>",
+  "license": "BSD-3-Clause",
+  "scripts": {
+    "build": "tsc",
+    "format": "prettier --write src/**/*.{ts,tsx}",
+    "test": "jest",
+    "watch": "tsc --watch",
+    "prepublishOnly": "npm run build && npm test"
+  },
+  "keywords": [
+    "gatsby",
+    "gatsby-plugin",
+    "gatsby-source-notionso",
+    "notionso"
+  ],
+  "peerDependencies": {
+    "gatsby": "^2.18.17"
+  },
+  "dependencies": {
+    "axios": "^0.19.0",
+    "debug": "^4.1.1",
+    "fs-extra": "^8.1.0",
+    "gatsby-source-filesystem": "^2.1.43",
+    "lodash": "^4.17.15",
+    "oneline": "^1.0.3"
+  },
+  "devDependencies": {
+    "@types/axios": "^0.14.0",
+    "@types/fs-extra": "^8.0.1",
+    "@types/graphql": "^14.5.0",
+    "@types/jest": "^24.0.24",
+    "@types/lodash": "^4.14.149",
+    "@types/node": "^13.1.0",
+    "@typescript-eslint/eslint-plugin": "^2.13.0",
+    "@typescript-eslint/parser": "^2.13.0",
+    "eslint": "^6.8.0",
+    "eslint-config-prettier": "^6.8.0",
+    "eslint-plugin-prettier": "^3.1.2",
+    "gatsby": "^2.18.17",
+    "jest": "^24.9.0",
+    "prettier": "^1.19.1",
+    "ts-jest": "^24.2.0",
+    "typescript": "^3.7.4"
+  }
+}
