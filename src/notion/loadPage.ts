@@ -135,6 +135,7 @@ export default async function loadPage(
   let slug = `${indexPage}`;
   let createdAt = new Date().toISOString();
   let isDraft = false;
+  const tags: string[] = [];
 
   if (hasMeta) {
     if (meta['slug']) {
@@ -143,7 +144,7 @@ export default async function loadPage(
     // TODO: parse date so that it becomes an actual
     // date in GraphQL
     if (meta['date']) {
-      createdAt = meta['date'];
+      createdAt = new Date(meta['date'] + ' Z').toJSON();
     }
     if (meta['draft']) {
       const value = meta['draft'].toLowerCase();
@@ -153,6 +154,14 @@ export default async function loadPage(
         isDraft = true;
       }
     }
+    // tags can contain a comma separated list of value
+    if (meta['tags']) {
+      const value = meta['tags'].trim();
+      value
+        .split(',')
+        .map(t => t.trim())
+        .forEach(t => tags.push(t));
+    }
   }
 
   const item: NotionPageDescription = {
@@ -161,6 +170,7 @@ export default async function loadPage(
     indexPage,
     slug,
     createdAt,
+    tags,
     isDraft,
     excerpt,
     pageIcon: getAttributeAsString(page, 'pageIcon', ''),

@@ -50,6 +50,7 @@ export interface NotionPageDescription {
   excerpt: string;
   pageIcon: string;
   createdAt: string;
+  tags: string[];
   isDraft: boolean;
   blocks: NotionPageBlock[];
   images: NotionPageImage[];

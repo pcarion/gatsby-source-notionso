@@ -112,7 +112,8 @@ export const createSchemaCustomization: GatsbyNode['createSchemaCustomization'] 
       slug: String!
       excerpt: String!
       pageIcon: String!
-      createdAt: Date!
+      tags: [String!]
+      createdAt: Date @dateformat
       blocks: [NotionPage${pluginConfig.name}Block!]
       imageNodeIds: [String!]
       linkedPages: [NotionPage${pluginConfig.name}LinkedPage!]

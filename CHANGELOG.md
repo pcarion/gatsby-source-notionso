@@ -3,6 +3,12 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## 1.0.5 - 2020-01-26
+
+## Added
+- `tags: [String!]` added : this file is read from the tags value (comma seperated list of tags) in the meta/quote block
+- `createdAt` field is now formatted as a date in UTC zone
+
 ## 1.0.4 - 2020-01-14
 
 ## Changed
