@@ -11,7 +11,7 @@ describe('parseMetaText', () => {
   it('should parse excerpt 2', () => {
     const meta: NotionMeta = {};
     const parser = parseMetaText(meta);
-    expect(parser('!!hello ')).toBeTruthy();
+    expect(parser('!! hello ')).toBeTruthy();
     expect(meta).toEqual({ excerpt: 'hello' });
   });
   it('should parse slug 1', () => {
@@ -23,8 +23,8 @@ describe('parseMetaText', () => {
   it('should parse slug 2', () => {
     const meta: NotionMeta = {};
     const parser = parseMetaText(meta);
-    expect(parser('!slugx b t')).toBeTruthy();
-    expect(meta).toEqual({ slug: 'x-b-t' });
+    expect(parser('!slug b t/notok')).toBeTruthy();
+    expect(meta).toEqual({ slug: 'b-t-notok' });
   });
   it('should parse slug 3', () => {
     const meta: NotionMeta = {};
@@ -113,8 +113,8 @@ describe('parseMetaText', () => {
   it('should parse multiple texts', () => {
     const meta: NotionMeta = {};
     const parser = parseMetaText(meta);
-    expect(parser('!date 2020/03/28')).toBeTruthy();
-    expect(parser('!tags t1, t2, t3')).toBeTruthy();
+    expect(parser('!date: 2020/03/28')).toBeTruthy();
+    expect(parser('!tags :t1, t2, t3')).toBeTruthy();
     expect(parser('!hello')).toBeFalsy();
     expect(parser('!! world')).toBeTruthy();
     expect(meta).toEqual({
