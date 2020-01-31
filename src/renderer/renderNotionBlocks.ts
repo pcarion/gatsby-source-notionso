@@ -135,9 +135,14 @@ function buildTree(
   block.blockIds.forEach(id => {
     const subBlock = findBlockById(id, blocks);
     if (!subBlock) {
-      throw new Error(`missing block id: ${id}`);
+      console.log(
+        `missing block id: ${id} in block: id=${block.blockId} type:${
+          block.type
+        } json:${JSON.stringify(block, null, '  ')}`,
+      );
+    } else {
+      root._subBlocks.push(buildTree(subBlock, blocks, debug));
     }
-    root._subBlocks.push(buildTree(subBlock, blocks, debug));
   });
   return root;
 }
