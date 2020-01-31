@@ -27,7 +27,7 @@ function parseDateValue(line: string): string {
 }
 
 function parseSlug(line: string): string {
-  return line; // .replace(/\W+/g, '-');
+  return line.replace(/\W+/g, '-');
 }
 
 function parseBooleanValue(line: string): boolean {
