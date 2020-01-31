@@ -42,6 +42,7 @@ export default async function loadPage(
   indexPage: number,
   notionLoader: NotionLoader,
   reporter: Reporter,
+  debug: boolean,
 ): Promise<NotionPageDescription> {
   // we load the given page
   await notionLoader.loadPage(pageId);
@@ -59,7 +60,6 @@ export default async function loadPage(
 
   const imageDescriptions: NotionPageImage[] = [];
   const linkedPages: NotionPageLinkedPage[] = [];
-  const itemBlocks: NotionPageBlock[] = [];
   const meta: NotionMeta = {};
   const metaParser = parseMetaText(meta);
 
@@ -82,8 +82,9 @@ export default async function loadPage(
           // for the text blocks, we parse them to see if they contain
           // meta attributes, if not, we addf them as regular blocks
           const text = getPropertyAsString(block, 'title', '').trim();
-          if (!metaParser(text)) {
-            itemBlocks.push(block);
+          if (metaParser(text)) {
+            // we change the type to meta to avoid the rendering of this text block
+            block.type = 'meta';
           }
         }
         break;
@@ -94,14 +95,12 @@ export default async function loadPage(
           signedUrl: '',
           contentId: block.blockId,
         });
-        itemBlocks.push(block);
         break;
       case 'ignore':
         // guess what... we ignore that one
         break;
       default:
-        // we keep the record by defaut
-        itemBlocks.push(block);
+        // we keep the block by defaut
         break;
     }
   }
@@ -116,10 +115,12 @@ export default async function loadPage(
     isDraft: !!meta.isDraft,
     excerpt: meta.excerpt || '',
     pageIcon: getAttributeAsString(page, 'pageIcon', ''),
-    blocks: itemBlocks,
+    blocks: [],
     images: imageDescriptions,
     linkedPages,
   };
-  // notionLoader.getBlocks(item.blocks, rootPageId);
+  // we return all the blocks
+  // TODO: as we already got those blocks above, we may want to build the list as we go
+  notionLoader.getBlocks(item.blocks, rootPageId);
   return item;
 }

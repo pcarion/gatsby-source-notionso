@@ -18,11 +18,11 @@ export default async function createNodesFromRootPage(
   reporter: Reporter,
 ): Promise<void> {
   try {
-    const { debug } = pluginConfig;
+    const debug = pluginConfig.debug || false;
 
     const loader = notionLoader(reporter, debug);
     // loading the root page
-    const item = await loadPage(rootPageId, '', 0, loader, reporter);
+    const item = await loadPage(rootPageId, '', 0, loader, reporter, debug);
 
     // we are interested only by the linked pages from the root page
     let index = 0;
