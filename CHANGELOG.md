@@ -3,6 +3,23 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## 1.1.5 - 2020-01-30
+
+### Added
+
+- meta information can now be set as text, with the !key syntax
+- meta tags are:
+```
+!slug why
+!date 2020/01/12
+!draft false
+!tags  intro, tag1
+!! What is this gatsby-source-notionso plugin?
+```
+
+### Breaking change
+- we removed the block quote mechanism previously used to add meta information to the page
+
 ## 1.0.5 - 2020-01-26
 
 ## Added

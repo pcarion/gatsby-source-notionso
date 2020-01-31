@@ -36,7 +36,7 @@ export default async function createNodeForPage(
   reporter: Reporter,
 ): Promise<object | null> {
   try {
-    const { debug } = pluginConfig;
+    const debug = pluginConfig.debug || false;
 
     // loading page
     const item = await loadPage(
@@ -45,6 +45,7 @@ export default async function createNodeForPage(
       index,
       notionLoader,
       reporter,
+      debug,
     );
     const imagesToDownload: NotionLoaderImageInformation[] = [];
     // we retrieve the list of iamges to download for the page

@@ -163,7 +163,6 @@ export default function notionLoader(
       return _blocks.find(b => b.blockId === blockId);
     },
     getBlocks(copyTo: NotionPageBlock[], pageId: string): void {
-      //_blocks.forEach(b => copyTo.push(b));
       _blocks.filter(b => b.blockId !== pageId).forEach(b => copyTo.push(b));
     },
     reset(): void {

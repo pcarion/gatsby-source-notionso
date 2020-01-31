@@ -1,5 +1,13 @@
 import { PluginOptions } from 'gatsby';
 
+export interface NotionMeta {
+  slug?: string;
+  date?: string;
+  tags?: string[];
+  isDraft?: boolean;
+  excerpt?: string;
+}
+
 export interface NotionPageAtt {
   att: string;
   value?: string;
