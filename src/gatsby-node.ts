@@ -28,7 +28,7 @@ export const sourceNodes: GatsbyNode['sourceNodes'] = async (
     createContentDigest,
     reporter,
   } = context;
-  const { createNode, createParentChildLink } = actions;
+  const { createNode, createParentChildLink, touchNode } = actions;
   if (!rootPageUrl) {
     reporter.panic(
       'gatsby-source-notionso requires a rootPageUrl parameter. This is the id of the root page for your notion content',
@@ -48,6 +48,14 @@ export const sourceNodes: GatsbyNode['sourceNodes'] = async (
     reporter.panic('gatsby-source-notionso requires a valid public URL.');
     return;
   }
+
+  // Prevent GraphQL type inference from crashing when node.localFile
+  // is set.
+  getNodes().forEach((node: { localFile___NODE: string }) => {
+    if (node.localFile___NODE) {
+      touchNode({ nodeId: node.localFile___NODE });
+    }
+  });
 
   await createNodesFromRootPage(
     rootPageId,
