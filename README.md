@@ -20,6 +20,10 @@ A demo site is available at: http://www.gatsbyplugins.com
 
 This demo site contain detailed information about how to use the plugin.
 
+## Example
+
+Check out the example repository here: https://github.com/pcarion/gatsby-source-notionso-example
+
 ## Installation
 ```sh
 $ npm install --save gatsby-source-notionso
